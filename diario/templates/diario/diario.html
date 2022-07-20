@@ -538,6 +538,9 @@ function hideContent(element){
 <footer>
     Painel de sessão
 
+   {% for detalhe in sessao %}
+
+    <a href="{% url 'detalhes_sessao' detalhe.id %}">
         <div style="
         margin-left: auto;
         margin-right: auto;
@@ -551,8 +554,8 @@ function hideContent(element){
         border-bottom-width:0;
         float:center">
         </div>
-
-
+    </a>
+    {% endfor %}
 
 </footer>
 

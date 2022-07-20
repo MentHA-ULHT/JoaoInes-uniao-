@@ -1,5 +1,5 @@
 from django.forms import ModelForm, TextInput, Textarea, Select, NumberInput, EmailInput
-from .models import Nota, Partilha, Cuidador, GrupoCare, DinamizadorConvidado
+from .models import Nota, Partilha, Cuidador, GrupoCare,PartilhaGrupo, DinamizadorConvidado, Respostas, Informacoes, NotaGrupo, Presenca
 
 
 class NotaForm(ModelForm):
@@ -59,3 +59,45 @@ class GrupoForm(ModelForm):
             'referenciacao': Select(attrs={'class': 'form-control'}),
         }
 
+class RespostasForm(ModelForm):
+    class Meta:
+        model = Respostas
+        fields = '__all__'
+        widgets = {
+            'Respostas': Textarea(attrs={'rows': 3, 'placeholder': 'Escreva uma resposta...'}),
+        }
+
+
+# Joao
+
+class PresencaForm(ModelForm):
+    class Meta:
+        model = Presenca
+        fields = '__all__'
+        widgets = {
+            'Presenca': Textarea(attrs={'rows': 3, 'placeholder': 'Escreva a Presenca'}),
+        }
+
+class InformacoesForm(ModelForm):
+    class Meta:
+        model = Informacoes
+        fields = '__all__'
+        widgets = {
+            'Informacoes': Textarea(attrs={'rows': 3, 'placeholder': 'Escreva uma informacao...'}),
+        }
+
+class PartilhaGrupoForm(ModelForm):
+    class Meta:
+        model = PartilhaGrupo
+        fields = '__all__'
+        widgets = {
+            'partilhaGrupo': Textarea(attrs={'rows': 3, 'placeholder': 'Escreva uma partilha sobre o grupo...'}),
+        }
+
+class NotaGrupoForm(ModelForm):
+    class Meta:
+        model = NotaGrupo
+        fields = '__all__'
+        widgets = {
+            'notaGrupo': Textarea(attrs={'rows': 3, 'placeholder': 'Escreva uma nota sobre o grupo...'}),
+        }

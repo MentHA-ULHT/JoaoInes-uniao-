@@ -5,7 +5,7 @@ from .models import DinamizadorConvidado, GrupoCare, \
     Cuidador, Mentor, Informacoes, PartilhaGrupo, Respostas, Presenca, NotaGrupo,Sessao, Exercicio
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
-from .forms import NotaForm, PartilhaForm, CuidadorForm, GrupoForm, DinamizadorForm
+from .forms import NotaForm, PartilhaForm, CuidadorForm, GrupoForm, DinamizadorForm, PresencaForm,PartilhaGrupoForm,InformacoesForm,RespostasForm,NotaGrupoForm
 
 
 # Create your views here.
@@ -20,11 +20,9 @@ def view_menu_esquerda(request):
     }
     return render(request, "diario/menu_esquerda.html", context)
 
-
 def view_participantes(request):
     contexto = {'grupos': GrupoCog.objects.all(), 'participantes': Participante.objects.all()}
     return render(request, "diario/participantes.html", contexto)
-
 
 def view_new_dinamizador(request):
     form = DinamizadorForm(request.POST or None)
@@ -36,7 +34,6 @@ def view_new_dinamizador(request):
         'form': form,
     }
     return render(request, "diario/new_dinamizador.html", contexto)
-
 
 def update_dinamizador(request, dinamizador_id):
     dinamizador = DinamizadorConvidado.objects.get(pk=dinamizador_id)
@@ -53,13 +50,11 @@ def update_dinamizador(request, dinamizador_id):
 
     return render(request, "diario/new_dinamizador.html", contexto)
 
-
 def delete_dinamizador(request, dinamizador_id):
     dinamizador = DinamizadorConvidado.objects.get(pk=dinamizador_id)
     dinamizador.delete()
 
     return HttpResponseRedirect(reverse('grupos'))
-
 
 def view_new_cuidador(request):
     form = CuidadorForm(request.POST or None)
@@ -71,7 +66,6 @@ def view_new_cuidador(request):
         'form': form,
     }
     return render(request, "diario/new_cuidador.html", contexto)
-
 
 def view_grupos(request):
     formGrupo = GrupoForm(request.POST or None)
@@ -85,7 +79,6 @@ def view_grupos(request):
     }
 
     return render(request, "diario/grupos.html", contexto)
-
 
 def update_groups(request, grupo_id):
     grupo = GrupoCare.objects.get(pk=grupo_id)
@@ -101,7 +94,6 @@ def update_groups(request, grupo_id):
     }
 
     return render(request, "diario/novo_grupo.html", contexto)
-
 
 def delete_groups(request, grupo_id):
     grupo = GrupoCare.objects.get(pk=grupo_id)
@@ -123,7 +115,6 @@ def view_grupo(request, grupo_id):
 
     }
     return render(request, "diario/grupo.html", contexto)
-
 
 def view_membros_grupo(request, grupo_id):
     cuidadores = Cuidador.objects.filter(grupoCare=grupo_id)
@@ -147,7 +138,6 @@ def view_membros_grupo(request, grupo_id):
     }
     return render(request, "diario/membros_grupo.html", contexto)
 
-
 def update_cuidador(request, cuidador_id):
     cuidador = Cuidador.objects.get(pk=cuidador_id)
     formCuidador = CuidadorForm(request.POST or None, instance=cuidador)
@@ -163,13 +153,11 @@ def update_cuidador(request, cuidador_id):
 
     return render(request, "diario/new_cuidador.html", contexto)
 
-
 def delete_cuidador(request, cuidador_id):
     cuidador = Cuidador.objects.get(pk=cuidador_id)
     cuidador.delete()
 
     return HttpResponseRedirect(reverse('grupos'))
-
 
 def view_sessoes_grupo(request, grupo_id):
     contexto = {
@@ -178,11 +166,9 @@ def view_sessoes_grupo(request, grupo_id):
     }
     return render(request, "diario/sessoes_grupo.html", contexto)
 
-
 def view_notas_grupo(request, grupo_id):
     contexto = {'grupo': GrupoCare.objects.get(id=grupo_id)}
     return render(request, "diario/notas_grupo.html", contexto)
-
 
 def view_novo_grupo(request):
     formGrupo = GrupoForm(request.POST or None)
@@ -193,13 +179,11 @@ def view_novo_grupo(request):
     contexto = {'formGrupo': formGrupo}
     return render(request, "diario/novo_grupo.html", contexto)
 
-
 def view_sem_grupo(request):
     contexto = {
         'cuidadores': Cuidador.objects.filter(grupoCare=None),
     }
     return render(request, "diario/sem_grupo.html", contexto)
-
 
 def view_filtrar_grupo_para_candidato(request, cuidador_id):
     cuidador = Cuidador.objects.get(id=cuidador_id)
@@ -234,14 +218,12 @@ def view_filtrar_grupo_para_candidato(request, cuidador_id):
     }
     return render(request, "diario/filtrar_grupo_para_candidato.html", contexto)
 
-
 def view_atribui_grupo(request, grupo_id, cuidador_id):
     cuidador = Cuidador.objects.get(id=cuidador_id)
     grupo = GrupoCare.objects.get(id=grupo_id)
     grupo.cuidadores.add(cuidador)
 
     return HttpResponseRedirect(reverse('grupos'))
-
 
 def view_perfil(request, participantes_id):
     contexto = {
@@ -250,7 +232,6 @@ def view_perfil(request, participantes_id):
     }
 
     return render(request, "diario/perfil.html", contexto)
-
 
 def view_diario(request):
     group_id = 1
@@ -265,9 +246,6 @@ def view_diario(request):
     }
 
     return render(request, "diario/diario.html", contexto)
-
-
-
 
 def view_diario_participante(request, id):
 
@@ -314,3 +292,43 @@ def view_diario_grupo(request, idGrupo):
     }
 
     return render(request, "diario/diario_grupo.html", context)
+
+
+
+
+def view_presencas_sessao(request):
+
+    group_id = 1
+    grupo = GrupoCog.objects.get(id=group_id)
+
+    sessao_id = 2
+    sessao = Sessao.objects.get(id=sessao_id)
+
+    # unico usado é o participantes
+
+    contexto = {
+        'participantes': Participante.objects.filter(grupoCog=group_id),
+        'grupo': GrupoCog.objects.get(id=group_id),
+        'exercicios': sessao.exercicios.all(),
+        'sessao': Sessao.objects.filter(id=sessao_id),
+    }
+
+    return render(request, "diario/presencas_sessao.html", contexto)
+
+
+
+def view_detalhes_sessao(request,id):
+    group_id = 1
+    grupo = GrupoCog.objects.get(id=group_id)
+
+    sessao_id = id
+    sessao = Sessao.objects.get(id=sessao_id)
+
+
+
+    contexto = {'grupos': GrupoCare.objects.all(),
+                'exercicios': sessao.exercicios.all(),
+                'sessao': Sessao.objects.filter(id=id)
+
+                }
+    return render(request, "diario/detalhes_sessao.html", contexto)

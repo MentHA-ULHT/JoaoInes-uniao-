@@ -30,3 +30,5 @@ admin.site.register(NotaGrupo)
 admin.site.register(Exercicio)
 
 
+
+

@@ -3,6 +3,8 @@ from django.urls import path
 
 urlpatterns = [
 
+    path('presencas_sessao', views.view_presencas_sessao, name='presencas_sessao'),
+
     path('new_cuidador',views.view_new_cuidador,name='new_cuidador'),
     path('new_dinamizador',views.view_new_dinamizador,name='new_dinamizador'),
     path('',views.view_grupos, name= 'grupos'),
@@ -30,5 +32,7 @@ urlpatterns = [
     path('diario', views.view_diario, name='diario'),
     path('diario_participante/<int:id>', views.view_diario_participante, name='diario_participante'),
     path('diario_grupo/<int:idGrupo>', views.view_diario_grupo, name='diario_grupo'),
+
+    path('detalhes_sessao/<int:id>', views.view_detalhes_sessao, name='detalhes_sessao'),
 
 ]
