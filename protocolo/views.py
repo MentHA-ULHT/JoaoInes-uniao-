@@ -388,11 +388,13 @@ def question_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
 
 def report_view(request, resolution_id):
     r = Resolution.objects.get(pk=resolution_id)
+    print(r)
     # É necessário o ensure_ascii = False para mostrar caracteres UTF-8
     report_json = r.statistics
     report_json_dumps = json.dumps(report_json, indent=1, sort_keys=False, ensure_ascii=False)
     report = {}
     answers = Answer.objects.filter(resolution=r)
+    print(answers)
 
     for area in Area.objects.filter(part=r.part):
         report[area.name] = {}
@@ -423,8 +425,8 @@ def report_view(request, resolution_id):
                         if answer.exists():
                             report[area.name][instrument.name]["Total"] += answer.get().quotation
                             report[area.name][instrument.name][dimension.name]["Total"] += answer.get().quotation
-                        if dimension.name == 'None' and section.name != 'None':
-                            quotations.append(answer.get().quotation)
+                            if dimension.name == 'None' and section.name != 'None':
+                                quotations.append(answer.get().quotation)
                 if dimension.name != 'None':
                     quotations.append(report[area.name][instrument.name][dimension.name]["Total"])
             print(dimension)
@@ -452,13 +454,14 @@ def report_view(request, resolution_id):
                 report[area.name][instrument.name]["Graph"] = plotly.offline.plot(fig, auto_open=False,
                                                                                   output_type="div")
 
-    print(json.dumps(report_json, indent=1, sort_keys=False, ensure_ascii=False))
+    #print(json.dumps(report_json, indent=1, sort_keys=False, ensure_ascii=False))
     # Funcionalidade
     context = {'report_json': report_json,
                'report_json_dumps': report_json_dumps,
                'report': report,
                'resolution': r,
                'answers': answers,
+               'instruments': Instrument.objects.all(),
                }
 
     return render(request, 'protocolo/report.html', context)
@@ -469,6 +472,7 @@ def protocol_participants_view(request, protocol_id):
     protocolo = Protocol.objects.get(pk=protocol_id)
     participants = Participante.objects.filter(avaliador=doctor)
     resolutions = Resolution.objects.filter(doctor=doctor)
+    print(resolutions.get().statistics)
 
     context = {'participants': participants,
                'resolutions': resolutions,

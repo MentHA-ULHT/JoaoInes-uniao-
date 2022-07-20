@@ -206,7 +206,7 @@ class Resolution(models.Model):
     statistics = models.JSONField(blank=True, default=dict)
 
     def __str__(self):
-        return f"{self.patient.nome} - {self.part.name} " \
+        return f"{self.id}. {self.patient.nome} - {self.part.name} " \
                f"({self.date.day}/{self.date.month}/{self.date.year}, {self.date.hour}:{self.date.minute})"
 
     def initialize_statistics(self):

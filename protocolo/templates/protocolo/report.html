@@ -25,11 +25,12 @@
                                                     <td style="width: 50%;margin-bottom: 0px;">
                                                         <strong>Instrumento: </strong>
                                                         <a href="#" class="jq-btn no-decor"
-                                                                {% for a in answers %}
-                                                                    {% if a.question.section.dimension.name == dim %}
-                                                           data-href="{% url 'dimensions' resolution.part.protocol.id resolution.part.id a.question.section.dimension.instrument.area.id a.question.section.dimension.instrument.id %}"
-                                                                    {% endif %}
-                                                                {% endfor %}
+
+                                                            {% for i in instruments %}
+                                                                {% if i.name == inst %}
+                                                                    data-href="{% url 'dimensions' resolution.part.protocol.id resolution.part.id i.area.id i.id resolution.patient.id %}"
+                                                                {% endif %}
+                                                            {% endfor %}
                                                         >
                                                             {{ inst }}
                                                             <svg style="margin-top: 0px;"
@@ -47,11 +48,11 @@
                                                         {% for dim, section in dimension.items %}
                                                             {% if forloop.counter0 == 0 %}
                                                                 <!-- Nada -->
-                                                            {% elif dim != 'None' and dim != 'Graph'%}
+                                                            {% elif dim != 'None' and dim != 'Graph' %}
                                                                 <a href="#" class="jq-btn no-decor"
                                                                         {% for a in answers %}
                                                                             {% if a.question.section.dimension.name == dim %}
-                                                                   data-href="{% url 'sections' resolution.part.protocol.id resolution.part.id a.question.section.dimension.instrument.area.id a.question.section.dimension.instrument.id a.question.section.dimension.id %}"
+                                                                   data-href="{% url 'sections' resolution.part.protocol.id resolution.part.id a.question.section.dimension.instrument.area.id a.question.section.dimension.instrument.id a.question.section.dimension.id resolution.patient.id %}"
                                                                             {% endif %}
                                                                         {% endfor %}
                                                                 >
@@ -77,7 +78,7 @@
     margin-right: auto;
     align: center;">
                                                         {% if dimension.Graph %}
-                                                        {{ dimension.Graph|safe  }}
+                                                            {{ dimension.Graph|safe }}
                                                         {% endif %}
                                                     </td>
                                                 </tr>

@@ -35,7 +35,20 @@
                                         <td>{{ p.nome }}</td>
                                         <td style="text-align: center;">{{ p.idade }}</td>
                                         <td style="text-align: center;">{{ p.sexo }}</td>
-                                        <td style="text-align: center;"></td>
+                                        <td style="text-align: center;">
+                                            {% for r in resolutions %}
+                                                {% if r.doctor == request.user and r.patient == p %}
+                                                    {% if r.total_percentage == 100 %}
+                                                        <i class="fa fa-check" style="color: var(--bs-blue);"></i>
+                                                    {% elif r.total_percentage > 0 %}
+                                                        <div class="spinner-border text-primary" role="status">
+                                                            <span class="sr-only">Loading...</span>
+                                                        </div>
+                                                    {% else %}
+                                                    {% endif %}
+                                                {% endif %}
+                                            {% endfor %}
+                                        </td>
                                         <td style="text-align: center;"></td>
                                         <td style="text-align: center;"></td>
                                         <td style="text-align: center;"></td>
