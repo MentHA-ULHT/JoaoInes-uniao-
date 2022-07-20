@@ -54,7 +54,7 @@
                                         <!-- Button -->
                                         <td style="text-align: right; padding-right:25px;">
                                             <a href="#" class="jq-btn"
-                                               data-href="{% url 'areas' protocol.id part.id %}">
+                                               data-href="{% url 'areas' protocol.id part.id patient.id %}">
                                                 <button class="btn btn-primary" type="button"
                                                         style="border-radius: 217px;">
                                                     <i class="fa fa-chevron-right"
@@ -77,7 +77,7 @@
                         </div>
                         <!-- Buttons -->
                         <div class="flex-buttons">
-                            <button id="previous" class="btn jq-btn btn-primary flex-left" data-href="{% url 'protocols' %}"
+                            <button id="previous" class="btn jq-btn btn-primary flex-left" data-href="{% url 'protocol-participants' protocol.id %}"
                                     type="button">
                                 <i class="fa fa-chevron-left"></i>&nbsp; Anterior
                             </button>

@@ -6,7 +6,7 @@ from .functions import *
 from .forms import *
 from diario.models import *
 
-#Other Imports
+# Other Imports
 import plotly.graph_objects as go
 import plotly
 import pandas as pd
@@ -16,18 +16,22 @@ import pandas as pd
 def dashboard_view(request):
     return render(request, 'protocolo/dashboard.html')
 
+
 def dashboard_content_view(request):
     return render(request, 'protocolo/dashboardcontent.html')
+
 
 def protocolos_view(request):
     context = {'protocolos': Protocol.objects.all().order_by('order')}
     return render(request, 'protocolo/protocolos.html', context)
 
 
-def parts_view(request, protocol_id):
+def parts_view(request, protocol_id, patient_id):
     protocol = Protocol.objects.get(pk=protocol_id)
-    resolutions = Resolution.objects.filter(patient=request.user)  # Mudar request.user para o patient depois
+    resolutions = Resolution.objects.filter(doctor=request.user, patient=Participante.objects.filter(
+        pk=patient_id).get())  # Mudar request.user para o patient depois
     parts = Part.objects.filter(protocol=protocol_id).order_by('order')
+    patient = Participante.objects.get(pk=patient_id)
 
     # statistics
     answered_list = []
@@ -48,25 +52,27 @@ def parts_view(request, protocol_id):
         'parts': zip(parts, answered_list, percentage_list),
         'protocol': protocol,
         'resolutions': resolutions,
+        'patient': patient,
     }
     return render(request, 'protocolo/parts.html', context)
 
 
-def areas_view(request, protocol_id, part_id):
+def areas_view(request, protocol_id, part_id, patient_id):
     protocol = Protocol.objects.get(pk=protocol_id)
     part = Part.objects.get(pk=part_id)
     areas = Area.objects.filter(part=part).order_by('order')
+    patient = Participante.objects.get(pk=patient_id)
 
     # ESTOU A CRIAR A RESOLUÇAO AQUI, MAS DEPOIS MUDAR DE SITIO
     r = None
-    if Resolution.objects.filter(patient=request.user, part=part).exists():
-        r = Resolution.objects.filter(patient=request.user, part=part).get()
+    if Resolution.objects.filter(patient=patient, part=part, doctor=request.user).exists():
+        r = Resolution.objects.filter(patient=patient, part=part, doctor=request.user).get()
     else:
-        r = Resolution(patient=request.user, part=part)
+        r = Resolution(patient=patient, part=part, doctor=request.user)
         r.initialize_statistics()
         r.save()
         # Sem esta ultima linha a página das àreas vinha vazia
-        r = Resolution.objects.get(patient=request.user, part=part)
+        r = Resolution.objects.get(patient=patient, part=part, doctor=request.user)
 
     # statistics
     # print_nested_dict(r.statistics, 0)
@@ -82,20 +88,22 @@ def areas_view(request, protocol_id, part_id):
         'areas': zip(areas, answered_list, percentage_list),
         'part': part,
         'protocol': protocol,
-        'resolution': r.id
+        'resolution': r.id,
+        'patient': patient,
     }
     return render(request, 'protocolo/areas.html', context)
 
 
-def instruments_view(request, protocol_id, part_id, area_id):
+def instruments_view(request, protocol_id, part_id, area_id, patient_id):
     protocol = Protocol.objects.get(pk=protocol_id)
     part = Part.objects.get(pk=part_id)
     area = Area.objects.get(pk=area_id)
+    patient = Participante.objects.get(pk=patient_id)
 
     instruments = Instrument.objects.filter(area=area_id).order_by('order')
 
     # statistics
-    r = Resolution.objects.get(patient=request.user, part=part)
+    r = Resolution.objects.get(patient=patient, doctor=request.user, part=part)
     # print_nested_dict(r.statistics, 0)
     answered_list = []
     percentage_list = []
@@ -112,24 +120,26 @@ def instruments_view(request, protocol_id, part_id, area_id):
         'part': part,
         'protocol': protocol,
         'instruments': zip(instruments, answered_list, percentage_list),
-        'resolution' : r.id,
+        'resolution': r.id,
+        'patient': patient,
     }
 
     return render(request, 'protocolo/instruments.html', context)
 
 
-def dimensions_view(request, protocol_id, part_id, area_id, instrument_id):
+def dimensions_view(request, protocol_id, part_id, area_id, instrument_id, patient_id):
     protocol = Protocol.objects.get(pk=protocol_id)
     part = Part.objects.get(pk=part_id)
     area = Area.objects.get(pk=area_id)
     instrument = Instrument.objects.get(pk=instrument_id)
     dimensions = Dimension.objects.filter(instrument=instrument_id).order_by('order')
+    patient = Participante.objects.get(pk=patient_id)
 
     if len(dimensions) == 1:
-        return redirect('sections', protocol_id, part_id, area_id, instrument_id, dimensions.get().id)
+        return redirect('sections', protocol_id, part_id, area_id, instrument_id, dimensions.get().id, patient_id)
 
     # statistics
-    r = Resolution.objects.get(patient=request.user, part=part)
+    r = Resolution.objects.get(patient=patient, doctor=request.user, part=part)
     # print_nested_dict(r.statistics, 0)
     answered_list = []
     percentage_list = []
@@ -148,24 +158,25 @@ def dimensions_view(request, protocol_id, part_id, area_id, instrument_id):
         'instrument': instrument,
         'dimensions': zip(dimensions, answered_list, percentage_list),
         'resolution': r.id,
+        'patient': patient,
     }
     return render(request, 'protocolo/dimensions.html', context)
 
 
-def sections_view(request, protocol_id, part_id, area_id, instrument_id, dimension_id):
+def sections_view(request, protocol_id, part_id, area_id, instrument_id, dimension_id, patient_id):
     protocol = Protocol.objects.get(pk=protocol_id)
     part = Part.objects.get(pk=part_id)
     area = Area.objects.get(pk=area_id)
     instrument = Instrument.objects.get(pk=instrument_id)
     dimension = Dimension.objects.get(pk=dimension_id)
+    patient = Participante.objects.get(pk=patient_id)
 
     sections = Section.objects.filter(dimension=dimension_id).order_by('order')
     if len(sections) == 1:
-        return redirect('question', protocol_id,part_id, area_id ,instrument_id ,dimension_id ,sections.get().id)
-
+        return redirect('question', protocol_id, part_id, area_id, instrument_id, dimension_id, sections.get().id, patient_id)
 
     # statistics
-    r = Resolution.objects.get(patient=request.user, part=part)
+    r = Resolution.objects.get(patient=patient, doctor=request.user, part=part)
     # print_nested_dict(r.statistics, 0)
     answered_list = []
     percentage_list = []
@@ -191,6 +202,7 @@ def sections_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
         'dimension': dimension,
         'sections': zip(sections, answered_list, percentage_list),
         'resolution': r.id,
+        'patient': patient,
     }
 
     print(instrument.number_of_dimensions)
@@ -198,7 +210,7 @@ def sections_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
     return render(request, 'protocolo/sections.html', context)
 
 
-def question_view(request, protocol_id, part_id, area_id, instrument_id, dimension_id, section_id):
+def question_view(request, protocol_id, part_id, area_id, instrument_id, dimension_id, section_id, patient_id):
     protocol = Protocol.objects.get(pk=protocol_id)
     part = Part.objects.get(pk=part_id)
     area = Area.objects.get(pk=area_id)
@@ -206,9 +218,10 @@ def question_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
     dimension = Dimension.objects.get(pk=dimension_id)
     section = Section.objects.get(pk=section_id)
     question = Question.objects.filter(section=section.id).first()
-    r = Resolution.objects.get(patient=request.user, part=part)
-    answers = Answer.objects.filter(resolution=r)
     form = uploadAnswerForm(request.POST or None)
+    patient = Participante.objects.get(pk=patient_id)
+    r = Resolution.objects.get(patient=patient, doctor=request.user, part=part)
+    answers = Answer.objects.filter(resolution=r)
 
     context = {
         'area': area,
@@ -221,6 +234,7 @@ def question_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
         'form': form,
         'resolution': r.id,
         'answers': answers,
+        'patient': patient,
     }
 
     if question.question_type == 3:
@@ -231,7 +245,6 @@ def question_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
             for answer in answers:
                 if question == answer.question:
                     answered_ids.append(question.id)
-
 
         # Esta parte permite dividir o question type 3 em dois
         # Um que tem sempre as mesmas respostas, e mostrará a página como uma tabela
@@ -273,7 +286,7 @@ def question_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
         if question.question_type == 1:
             id_answer = request.POST.get("choice")
             r = Resolution.objects.get(part=part,
-                                       patient=request.user)
+                                       patient=patient, doctor=request.user)
             if existing_answer is None:
                 # cria uma nova associação
                 new_answer = Answer(question=question,
@@ -300,7 +313,7 @@ def question_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
             return redirect('sections',
                             protocol_id=protocol_id, part_id=part_id,
                             area_id=area_id, instrument_id=instrument_id,
-                            dimension_id=dimension_id)
+                            dimension_id=dimension_id, patient_id=patient_id)
 
         elif question.question_type == 2:
             form = uploadAnswerForm(request.POST, files=request.FILES)
@@ -327,13 +340,13 @@ def question_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
                     existing_answer.notes = new_answer.notes
                     existing_answer.save()
 
-                r.change_quotation( f'{area_id}', f'{instrument_id}', f'{dimension_id}',
-                                           f'{section_id}', new_answer.quotation)
+                r.change_quotation(f'{area_id}', f'{instrument_id}', f'{dimension_id}',
+                                   f'{section_id}', new_answer.quotation)
                 # quando guarda a pergunta volta às secções
                 return redirect('sections',
                                 protocol_id=protocol_id, part_id=part_id,
                                 area_id=area_id, instrument_id=instrument_id,
-                                dimension_id=dimension_id)
+                                dimension_id=dimension_id, patient_id=patient_id)
 
         elif question.question_type == 3:
             for key in request.POST:
@@ -366,10 +379,9 @@ def question_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
                         r.change_quotation(f'{area_id}', f'{instrument_id}', f'{dimension_id}',
                                            f'{section_id}', quotation)
 
-
             return redirect('instruments',
-                                protocol_id=protocol_id, part_id=part_id,
-                                area_id=area_id)
+                            protocol_id=protocol_id, part_id=part_id,
+                            area_id=area_id, patient_id=patient_id)
 
     return render(request, 'protocolo/question.html', context)
 
@@ -418,7 +430,8 @@ def report_view(request, resolution_id):
             print(dimension)
             print(quotations)
             print(names)
-            if len(quotations) == len(names) and dimension.name != 'None' or len(quotations) == len(names) and section.name != 'None':
+            if len(quotations) == len(names) and dimension.name != 'None' or len(quotations) == len(
+                    names) and section.name != 'None':
                 print("gerou graph")
                 fig = go.Figure(data=go.Scatterpolar(
                     r=quotations,
@@ -435,9 +448,9 @@ def report_view(request, resolution_id):
                     showlegend=False
                 )
                 fig.update_yaxes(automargin=True)
-                #fig.show()
-                report[area.name][instrument.name]["Graph"] = plotly.offline.plot(fig, auto_open = False, output_type="div")
-
+                # fig.show()
+                report[area.name][instrument.name]["Graph"] = plotly.offline.plot(fig, auto_open=False,
+                                                                                  output_type="div")
 
     print(json.dumps(report_json, indent=1, sort_keys=False, ensure_ascii=False))
     # Funcionalidade
@@ -451,10 +464,17 @@ def report_view(request, resolution_id):
     return render(request, 'protocolo/report.html', context)
 
 
-def participants_view(request):
+def protocol_participants_view(request, protocol_id):
     doctor = request.user
-
+    protocolo = Protocol.objects.get(pk=protocol_id)
     participants = Participante.objects.filter(avaliador=doctor)
+    resolutions = Resolution.objects.filter(doctor=doctor)
 
-    context = {'participants': participants}
+    context = {'participants': participants,
+               'resolutions': resolutions,
+               'protocolo': protocolo}
+    return render(request, 'protocolo/protocol-participants.html', context)
+
+
+def participants_view(request):
     return render(request, 'protocolo/participants.html', context)

@@ -5,6 +5,7 @@ from django.utils import timezone
 from django.conf import settings
 from .functions import percentage
 from django.core.validators import MaxValueValidator, MinValueValidator
+from diario.models import *
 
 # Create your models here.
 
@@ -195,16 +196,17 @@ class PossibleAnswer(Common):
 
 
 class Resolution(models.Model):
-    patient = models.ForeignKey(settings.AUTH_USER_MODEL,  # estou a ir buscar isto à tabela user do django
-                                on_delete=models.CASCADE)
+    patient = models.ForeignKey(Participante,
+                                on_delete=models.CASCADE, default=None, blank=True, null=True)
     part = models.ForeignKey('Part', on_delete=models.CASCADE)
     date = models.DateTimeField(default=timezone.now)
+    doctor = models.ForeignKey(settings.AUTH_USER_MODEL,
+                                on_delete=models.CASCADE, default=None, blank=True, null=True)
 
     statistics = models.JSONField(blank=True, default=dict)
 
     def __str__(self):
-        name = " ".join([self.patient.first_name, self.patient.last_name])
-        return f"{name} - {self.part.name} " \
+        return f"{self.patient.nome} - {self.part.name} " \
                f"({self.date.day}/{self.date.month}/{self.date.year}, {self.date.hour}:{self.date.minute})"
 
     def initialize_statistics(self):
