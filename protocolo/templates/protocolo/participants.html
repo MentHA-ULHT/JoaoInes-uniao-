@@ -1,0 +1,53 @@
+<div id="wrapper">
+    <div class="d-flex flex-column" id="content-wrapper">
+        <div id="content">
+            <div class="d-sm-flex justify-content-between align-items-center mb-4">
+            </div>
+            <div class="container-fluid">
+                <div class="card shadow">
+                    <div class="card-header py-3">
+                        <p class="text-primary m-0 fw-bold" style="font-size: 20px;">Participantes</p>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th style="text-align: left;">Nome</th>
+                                    <th style="text-align: center;">Idade</th>
+                                    <th style="text-align: center;">Sexo</th>
+                                    <th style="text-align: center;">Rastreio</th>
+                                    <th style="text-align: center;">Pré-Teste</th>
+                                    <th style="text-align: center;">Monit I</th>
+                                    <th style="text-align: center;">Monit II</th>
+                                    <th style="text-align: center;">Pós-Teste</th>
+                                    <th style="text-align: left;">Referenciação</th>
+                                    <th style="text-align: center;"></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for p in participants %}
+                                <tr>
+                                    <td>{{p.nome}}</td>
+                                    <td style="text-align: center;">{{ p.idade }}</td>
+                                    <td style="text-align: center;">{{ p.sexo }}</td>
+                                    <td style="text-align: center;"></td>
+                                    <td style="text-align: center;"></td>
+                                    <td style="text-align: center;"></td>
+                                    <td style="text-align: center;"></td>
+                                    <td style="text-align: center;"></td>
+                                    <td>{{ p.referenciacao.reference }}</td>
+                                    <td style="text-align: center;">BOTAO PERFIL</td>
+                                </tr>
+                                {% endfor %}
+                                <tr></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <a class="border rounded d-inline scroll-to-top" href="#page-top"><i class="fas fa-angle-up"></i></a>
+</div>
