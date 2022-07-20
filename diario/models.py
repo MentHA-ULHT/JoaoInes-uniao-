@@ -1,7 +1,7 @@
 from django.db import models
 from datetime import datetime
 from django import forms
-
+from django.conf import settings
 
 ##### Eventos ######################################
 
@@ -155,6 +155,7 @@ class Participante(Utilizador):
     referenciacao = models.ForeignKey(Reference, on_delete= models.CASCADE)
     grupoCog = models.ForeignKey(GrupoCog, on_delete=models.CASCADE, null=True, blank=True, related_name='participantes')
     cuidadores = models.ManyToManyField(Cuidador, blank=True, related_name='participantes')
+    avaliador = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE, default=None, blank=True, null=True)
 
     def __str__(self):
         return f'{self.nome}'
