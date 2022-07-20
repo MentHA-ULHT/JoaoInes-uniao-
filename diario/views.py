@@ -265,3 +265,52 @@ def view_diario(request):
     }
 
     return render(request, "diario/diario.html", contexto)
+
+
+
+
+def view_diario_participante(request, id):
+
+    form = NotaForm(request.POST or None)
+    if form.is_valid():
+        form.save()
+
+    form = PartilhaForm(request.POST or None)
+    if form.is_valid():
+        form.save()
+
+    context = {
+        'participante_id': id,
+        'notas': Nota.objects.filter(participante=id).order_by('-data'),
+        'partilhas': Partilha.objects.filter(participante=id).order_by('-data'),
+        'informacoes': Informacoes.objects.filter(participante=id).order_by('-data'),
+        'respostas': Respostas.objects.filter(participante=id).order_by('-data'),
+        'notaForm': NotaForm(),
+        'partilhaForm': PartilhaForm()
+    }
+
+    return render(request, "diario/diario_participante.html", context)
+
+def view_diario_grupo(request, idGrupo):
+    form = NotaGrupoForm(request.POST or None)
+    if form.is_valid():
+        form.save()
+
+    form = RespostasForm(request.POST or None)
+    if form.is_valid():
+        form.save()
+
+
+    context = {
+        'participantes': Participante.objects.filter(grupoCog=idGrupo).order_by('nome'),
+        'grupo_id': idGrupo,
+        'notasGrupo': NotaGrupo.objects.filter(grupo=idGrupo),
+        'partilhas': PartilhaGrupo.objects.filter(grupo=idGrupo),
+        'informacoes': Informacoes.objects.all(),
+        'respostas': Respostas.objects.all(),
+        'notaForm': NotaGrupoForm(),
+        'partilhaGrupoForm': PartilhaGrupoForm()
+
+    }
+
+    return render(request, "diario/diario_grupo.html", context)
