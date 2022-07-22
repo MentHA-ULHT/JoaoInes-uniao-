@@ -299,10 +299,11 @@ class Answer(models.Model):
                                                unique=False,
                                                blank=True, null=True)
     text_answer = models.TextField(max_length=LONG_LEN, blank=True)
+    submitted_answer = models.ImageField(upload_to=resolution_path, blank=True, null=True)
     quotation = models.IntegerField(default=0, null=True, blank=True)
     notes = models.TextField(max_length=LONG_LEN, blank=True, null=True)
     resolution = models.ForeignKey('Resolution', on_delete=models.CASCADE)
-    submitted_answer = models.ImageField(upload_to=resolution_path, blank=True, null=True)
+
 
     @property
     def quotation_max(self):

@@ -1,5 +1,7 @@
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, HttpResponse, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login
 from .models import Protocol, Part, Area, Instrument, Dimension, Section, Question, Resolution, Answer, PossibleAnswer
 from django.urls import reverse
 from .functions import *
@@ -173,7 +175,8 @@ def sections_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
 
     sections = Section.objects.filter(dimension=dimension_id).order_by('order')
     if len(sections) == 1:
-        return redirect('question', protocol_id, part_id, area_id, instrument_id, dimension_id, sections.get().id, patient_id)
+        return redirect('question', protocol_id, part_id, area_id, instrument_id, dimension_id, sections.get().id,
+                        patient_id)
 
     # statistics
     r = Resolution.objects.get(patient=patient, doctor=request.user, part=part)
@@ -454,7 +457,7 @@ def report_view(request, resolution_id):
                 report[area.name][instrument.name]["Graph"] = plotly.offline.plot(fig, auto_open=False,
                                                                                   output_type="div")
 
-    #print(json.dumps(report_json, indent=1, sort_keys=False, ensure_ascii=False))
+    # print(json.dumps(report_json, indent=1, sort_keys=False, ensure_ascii=False))
     # Funcionalidade
     context = {'report_json': report_json,
                'report_json_dumps': report_json_dumps,
@@ -472,7 +475,6 @@ def protocol_participants_view(request, protocol_id):
     protocolo = Protocol.objects.get(pk=protocol_id)
     participants = Participante.objects.filter(avaliador=doctor)
     resolutions = Resolution.objects.filter(doctor=doctor)
-    print(resolutions.get().statistics)
 
     context = {'participants': participants,
                'resolutions': resolutions,
@@ -480,5 +482,54 @@ def protocol_participants_view(request, protocol_id):
     return render(request, 'protocolo/protocol-participants.html', context)
 
 
+@login_required(login_url='/login/')
 def participants_view(request):
+    doctor = request.user
+    participants = Participante.objects.filter(avaliador=doctor)
+    resolutions = Resolution.objects.filter(doctor=doctor)
+
+    context = {'participants': participants,
+               'resolutions': resolutions,
+               'protocolo': protocolo}
     return render(request, 'protocolo/participants.html', context)
+
+
+def login_view(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            return redirect('dashboard')
+
+    return render(request, 'protocolo/login.html')
+
+
+from django.contrib.auth import logout
+
+
+def logout_view(request):
+    logout(request)
+
+    return render(request, 'protocolo/login.html')
+
+
+def profile_view(request, participant_id):
+    p = Participante.objects.filter(pk=participant_id).get()
+    c = []
+
+    for cuidador in Cuidador.objects.all():
+        if cuidador in p.cuidadores.all():
+            c.append(cuidador.nome)
+
+    cuidadores = ", ".join(c)
+
+    print(cuidadores)
+    context = {
+        'p': p,
+        'cuidadores': cuidadores,
+    }
+
+    return render(request, 'protocolo/profile.html', context)
