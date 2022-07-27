@@ -144,10 +144,11 @@ class Section(Common):
 
 class Question(Common):
     #1 = Multiple Choice, 2 = Escrita aberta ou submissão, 3 = Tabela de escolhas multiplas (p. ex. Psicossintomatologia BSI)
+    #4 = Checkboxes
     question_type = models.PositiveIntegerField(default=1,
                                         blank=False,
-                                        validators=[MinValueValidator(1), MaxValueValidator(3)])
-    instruction = models.CharField(max_length=LONG_LEN,
+                                        validators=[MinValueValidator(1), MaxValueValidator(4)])
+    instruction = models.TextField(max_length=LONG_LEN,
                                    blank=True)
     evaluation_scale = models.CharField(max_length=LONG_LEN,
                                         blank=True,
@@ -326,3 +327,25 @@ class Answer(models.Model):
             return f"{self.question.name} >> Reposta com imágem"
         else:
             return f"{self.question.name} >> Sem Resposta"
+
+class TextInputAnswer(models.Model):
+    # class para inputs
+    # fk para answer
+    # related_name para aceder desde a answer
+    answer = models.ForeignKey('Answer',
+                                 on_delete=models.CASCADE,related_name='TIAnswer')
+    seconds = models.IntegerField(default=0, null=True, blank=True)
+    text = models.TextField(max_length=LONG_LEN, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.text}"
+
+class MultipleChoicesCheckbox(Common):
+    #class parecida à multiple choices
+    #fk para answer
+    #text field
+    answer = models.ForeignKey('Answer', on_delete=models.CASCADE, related_name='MCCAnswer')
+    choice = models.ForeignKey('PossibleAnswer', on_delete=models.CASCADE, related_name='CheckBoxChoice')
+
+    def __str__(self):
+        return f"{self.choice.name}"

@@ -208,7 +208,7 @@ def sections_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
         'patient': patient,
     }
 
-    print(instrument.number_of_dimensions)
+    #print(instrument.number_of_dimensions)
 
     return render(request, 'protocolo/sections.html', context)
 
@@ -257,18 +257,19 @@ def question_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
         for question in Question.objects.filter(section=section.id):
             if ans == 0:
                 ans = question.possible_answers.all()
-                print(ans)
+                #print(ans)
             else:
                 equal = set(question.possible_answers.all()) == set(ans)
 
         context['equal_answers'] = equal
         context['question_list'] = question_list
 
+    existing_answer_id = []
     for answer in answers:
         if answer.resolution == r:
             if answer.question == question:
                 if answer.multiple_choice_answer is not None:
-                    existing_answer_id = answer.multiple_choice_answer.id
+                    existing_answer_id.apped(answer.multiple_choice_answer.id)
                     context['existing_answer_id'] = existing_answer_id
                 if answer.text_answer is not None:
                     form.initial.update({'text_answer': answer.text_answer})
@@ -278,6 +279,12 @@ def question_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
                     context['notes'] = answer.notes
                 if answer.quotation is not None:
                     context['quotation'] = answer.quotation
+                if len(answer.MCCAnswer.all()) >= 1:
+                    list = []
+                    for mca in answer.MCCAnswer.all():
+                        list.append(mca.choice.id)
+                    existing_answer_id = list
+                    context['existing_answer_id'] = list
 
     if request.method == 'POST':
         existing_answer = None
@@ -381,10 +388,46 @@ def question_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
                                                f'{section_id}')
                         r.change_quotation(f'{area_id}', f'{instrument_id}', f'{dimension_id}',
                                            f'{section_id}', quotation)
-
             return redirect('instruments',
                             protocol_id=protocol_id, part_id=part_id,
                             area_id=area_id, patient_id=patient_id)
+
+        elif question.question_type == 4:
+            existing = False
+            if len(Answer.objects.filter(question=question, resolution=r)) >= 1:
+                a = Answer.objects.filter(question=question, resolution=r).get()
+                a.delete()
+                existing = True
+            a = Answer()
+            a.resolution = r
+            a.question = question
+            a.notes = request.POST.get('notes')
+            q=0
+            a.save()
+            for id in request.POST.getlist("choice"):
+                c = MultipleChoicesCheckbox()
+                c.answer = a
+                pa = PossibleAnswer.objects.filter(pk=id).get()
+                c.choice = pa
+                q = q + c.choice.quotation
+                c.save()
+            a.quotation = q
+            a.save()
+
+            if existing:
+                r.change_quotation(f'{area_id}', f'{instrument_id}', f'{dimension_id}',
+                                   f'{section_id}', q)
+            else:
+                r.increment_statistics(f'{part_id}', f'{area_id}', f'{instrument_id}', f'{dimension_id}',
+                                       f'{section_id}')
+                r.change_quotation(f'{area_id}', f'{instrument_id}', f'{dimension_id}',
+                                   f'{section_id}', q)
+
+
+
+            return redirect('sections',
+                            protocol_id=protocol_id, part_id=part_id,
+                            area_id=area_id,instrument_id=instrument_id, dimension_id=dimension_id, patient_id=patient_id)
 
     return render(request, 'protocolo/question.html', context)
 
@@ -489,8 +532,7 @@ def participants_view(request):
     resolutions = Resolution.objects.filter(doctor=doctor)
 
     context = {'participants': participants,
-               'resolutions': resolutions,
-               'protocolo': protocolo}
+               'resolutions': resolutions}
     return render(request, 'protocolo/participants.html', context)
 
 

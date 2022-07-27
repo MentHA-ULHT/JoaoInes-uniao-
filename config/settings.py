@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'tarefas',
     'diario',
     'protocolo',
+    'markdownify',
 ]
 
 MIDDLEWARE = [
@@ -131,3 +132,12 @@ MEDIA_URL = "/media/"
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+#Markdownify
+
+MARKDOWNIFY_STRIP = False
+MARKDOWNIFY_WHITELIST_TAGS = {
+ 'a', 'p',
+ 'h1', 'h2','h3','h4', 'h5', 'h6', 'h7',
+ 'ul', 'li', 'span',
+}
