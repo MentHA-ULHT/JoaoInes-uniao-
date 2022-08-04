@@ -144,10 +144,10 @@ class Section(Common):
 
 class Question(Common):
     #1 = Multiple Choice, 2 = Escrita aberta ou submissão, 3 = Tabela de escolhas multiplas (p. ex. Psicossintomatologia BSI)
-    #4 = Checkboxes
+    #4 = Checkboxes 5 = Multiplas text areas com cronómetro
     question_type = models.PositiveIntegerField(default=1,
                                         blank=False,
-                                        validators=[MinValueValidator(1), MaxValueValidator(4)])
+                                        validators=[MinValueValidator(1), MaxValueValidator(5)])
     instruction = models.TextField(max_length=LONG_LEN,
                                    blank=True)
     evaluation_scale = models.CharField(max_length=LONG_LEN,
@@ -164,8 +164,8 @@ class Question(Common):
                                               default=None,
                                               related_name='possible_answers',
                                               blank=True)
-    quotation_max = models.IntegerField(default=0)
-    quotation_min = models.IntegerField(default=1)
+    quotation_max = models.IntegerField(default=10)
+    quotation_min = models.IntegerField(default=0)
 
     @property
     def allow_submission(self):
@@ -287,6 +287,39 @@ class Resolution(models.Model):
         self.statistics[area_id][instrument_id][dimension_id][section_id]['quotation'] = quotation
         self.save()
 
+    def decrement_statistics(self, part_id: int, area_id: int, instrument_id: int, dimension_id: int, section_id: int):
+        part = Part.objects.get(pk=part_id)
+        self.statistics['total_answered'] -= 1
+        self.statistics['total_percentage'] = percentage \
+            (total=part.number_of_questions,
+             partial=self.statistics['total_answered'])
+
+        area = Area.objects.get(pk=area_id)
+        self.statistics[area_id]['answered'] -= 1
+        self.statistics[area_id]['percentage'] = \
+            percentage(total=area.number_of_questions,
+                       partial=self.statistics[area_id]['answered'])
+
+        instrument = Instrument.objects.get(pk=instrument_id)
+        self.statistics[area_id][instrument_id]['answered'] -= 1
+        self.statistics[area_id][instrument_id]['percentage'] = \
+            percentage(total=instrument.number_of_questions,
+                       partial=self.statistics[area_id][instrument_id]['answered'])
+
+        dimension = Dimension.objects.get(pk=dimension_id)
+        self.statistics[area_id][instrument_id][dimension_id]['answered'] -= 1
+        self.statistics[area_id][instrument_id][dimension_id]['percentage'] = \
+            percentage(total=dimension.number_of_questions,
+                       partial=self.statistics[area_id][instrument_id][dimension_id]['answered'])
+
+        section = Section.objects.get(pk=section_id)
+        self.statistics[area_id][instrument_id][dimension_id][section_id]['answered'] -= 1
+        self.statistics[area_id][instrument_id][dimension_id][section_id]['percentage'] = \
+            percentage(total=section.number_of_questions,
+                       partial=self.statistics[area_id][instrument_id][dimension_id][section_id]['answered'])
+
+        self.save()
+
 
 def resolution_path(instance, filename):
     return f'users/{instance.resolution.patient.id}/resolutions/{instance.resolution.id}/{filename}'
@@ -338,7 +371,7 @@ class TextInputAnswer(models.Model):
     text = models.TextField(max_length=LONG_LEN, blank=True, null=True)
 
     def __str__(self):
-        return f"{self.text}"
+        return f"{self.id}. {self.text}"
 
 class MultipleChoicesCheckbox(Common):
     #class parecida à multiple choices

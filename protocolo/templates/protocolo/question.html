@@ -52,6 +52,8 @@
                             {% include 'protocolo/mcq_question_table.html' %}
                         {% elif question.question_type == 4 %}
                             {% include 'protocolo/checkbox_question.html' %}
+                        {% elif question.question_type == 5 %}
+                            {% include 'protocolo/timer_question.html' %}
                         {% endif %}
 
                     </div>

@@ -208,7 +208,7 @@ def sections_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
         'patient': patient,
     }
 
-    #print(instrument.number_of_dimensions)
+    # print(instrument.number_of_dimensions)
 
     return render(request, 'protocolo/sections.html', context)
 
@@ -240,6 +240,8 @@ def question_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
         'patient': patient,
     }
 
+    print(answers)
+
     if question.question_type == 3:
         question_list = []
         answered_ids = []
@@ -257,7 +259,7 @@ def question_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
         for question in Question.objects.filter(section=section.id):
             if ans == 0:
                 ans = question.possible_answers.all()
-                #print(ans)
+                # print(ans)
             else:
                 equal = set(question.possible_answers.all()) == set(ans)
 
@@ -402,7 +404,7 @@ def question_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
             a.resolution = r
             a.question = question
             a.notes = request.POST.get('notes')
-            q=0
+            q = 0
             a.save()
             for id in request.POST.getlist("choice"):
                 c = MultipleChoicesCheckbox()
@@ -411,6 +413,16 @@ def question_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
                 c.choice = pa
                 q = q + c.choice.quotation
                 c.save()
+
+            if 'Repetição I' in question.name:
+                l = len(request.POST.getlist("choice"))
+                if l == 4:
+                    q = 2
+                elif l == 3:
+                    q = 1
+                else:
+                    q = 0
+
             a.quotation = q
             a.save()
 
@@ -423,13 +435,90 @@ def question_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
                 r.change_quotation(f'{area_id}', f'{instrument_id}', f'{dimension_id}',
                                    f'{section_id}', q)
 
+            return redirect('sections',
+                            protocol_id=protocol_id, part_id=part_id,
+                            area_id=area_id, instrument_id=instrument_id, dimension_id=dimension_id,
+                            patient_id=patient_id)
 
+        elif question.question_type == 5:
+            print(request.POST)
+            existing = False
+            if len(Answer.objects.filter(question=question, resolution=r)) >= 1:
+                a = Answer.objects.filter(question=question, resolution=r).get()
+                a.delete()
+                existing = True
+            a = Answer()
+            a.resolution = r
+            a.question = question
+            a.notes = request.POST.get('notes')
+            a.save()
+            counter = 0
+            for i in range(1, 5):
+                text_area = request.POST.get(str(i))
+                counter += len(text_area.split(","))
+                print(text_area)
+                ti = TextInputAnswer()
+                ti.answer = a
+                ti.seconds = i
+                ti.text = text_area
+                ti.save()
+            q = calculate_timer_quotation(counter)
+            a.quotation = q
+            a.save()
+
+            if existing:
+                r.change_quotation(f'{area_id}', f'{instrument_id}', f'{dimension_id}',
+                                   f'{section_id}', q)
+            else:
+                r.increment_statistics(f'{part_id}', f'{area_id}', f'{instrument_id}', f'{dimension_id}',
+                                       f'{section_id}')
+                r.change_quotation(f'{area_id}', f'{instrument_id}', f'{dimension_id}',
+                                   f'{section_id}', q)
 
             return redirect('sections',
                             protocol_id=protocol_id, part_id=part_id,
-                            area_id=area_id,instrument_id=instrument_id, dimension_id=dimension_id, patient_id=patient_id)
+                            area_id=area_id, instrument_id=instrument_id, dimension_id=dimension_id,
+                            patient_id=patient_id)
 
     return render(request, 'protocolo/question.html', context)
+
+
+def calculate_timer_quotation(question, i):
+    if not "Animais" in question.name:
+        if i < 2:
+            return 0
+        elif i <= 3:
+            return 1
+        elif i <= 5:
+            return 2
+        elif i <= 7:
+            return 3
+        elif i <= 10:
+            return 4
+        elif i <= 13:
+            return 5
+        elif i <= 17:
+            return 6
+        elif i > 17:
+            return 7
+    else:
+        if i < 5:
+            return 0
+        elif i <= 6:
+            return 1
+        elif i <= 8:
+            return 2
+        elif i <= 10:
+            return 3
+        elif i <= 13:
+            return 4
+        elif i <= 16:
+            return 5
+        elif i <= 21:
+            return 6
+        elif i > 21:
+            return 7
+
 
 
 def report_view(request, resolution_id):
@@ -470,17 +559,17 @@ def report_view(request, resolution_id):
                         answer = Answer.objects.filter(question=question, resolution=r)
                         if answer.exists():
                             report[area.name][instrument.name]["Total"] += answer.get().quotation
-                            report[area.name][instrument.name][dimension.name]["Total"] += answer.get().quotation
+                            if report[area.name][instrument.name][dimension.name]["Total"] + answer.get().quotation <= question.quotation_max:
+                                report[area.name][instrument.name][dimension.name]["Total"] += answer.get().quotation
                             if dimension.name == 'None' and section.name != 'None':
                                 quotations.append(answer.get().quotation)
                 if dimension.name != 'None':
                     quotations.append(report[area.name][instrument.name][dimension.name]["Total"])
-            print(dimension)
-            print(quotations)
-            print(names)
+            #print(dimension)
+            #print(quotations)
+            #print(names)
             if len(quotations) == len(names) and dimension.name != 'None' or len(quotations) == len(
                     names) and section.name != 'None':
-                print("gerou graph")
                 fig = go.Figure(data=go.Scatterpolar(
                     r=quotations,
                     theta=names,
@@ -509,6 +598,7 @@ def report_view(request, resolution_id):
                'answers': answers,
                'instruments': Instrument.objects.all(),
                }
+
 
     return render(request, 'protocolo/report.html', context)
 

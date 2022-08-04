@@ -6,10 +6,31 @@ $(document).ready(function () {
         document.getElementById("overlay").style.zIndex = "100";
     })
 
+
     function off() {
         document.getElementById("overlay").style.display = "none";
         document.getElementById("overlay").style.zIndex = "2";
     }
+
+    $(document).on("click", ".btn-timer", function () {
+        var seconds = 0
+
+        function tick() {
+          var counter = document.getElementById("clock");
+          seconds++;
+          counter.innerHTML =
+            "0:" + (seconds < 10 ? "0" : "") + String(seconds);
+          if (seconds < 60) {
+            setTimeout(tick, 1000);
+          } else {
+            document.getElementById("clock").innerHTML = "1:00";
+          }
+        }
+
+        tick();
+
+
+    })
 
 
     $(document).on("click", ".delete-same-id", function () {
