@@ -12,24 +12,26 @@ $(document).ready(function () {
         document.getElementById("overlay").style.zIndex = "2";
     }
 
-    $(document).on("click", ".btn-timer", function () {
-        var seconds = 0
+    var seconds = 0;
+    var ticking = false;
 
-        function tick() {
-          var counter = document.getElementById("clock");
-          seconds++;
-          counter.innerHTML =
-            "0:" + (seconds < 10 ? "0" : "") + String(seconds);
-          if (seconds < 60) {
-            setTimeout(tick, 1000);
-          } else {
-            document.getElementById("clock").innerHTML = "1:00";
-          }
+    function tick() {
+        if (ticking) {
+            var counter = document.getElementById("clock");
+            seconds++;
+            counter.innerHTML =
+                "0:" + (seconds < 10 ? "0" : "") + String(seconds);
+            if (seconds < 60) {
+                setTimeout(tick, 1000);
+            } else {
+                document.getElementById("clock").innerHTML = "1:00";
+            }
         }
+    }
 
+    $(document).on("click", ".btn-timer", function () {
+        ticking = (ticking == true) ? false : true
         tick();
-
-
     })
 
 
@@ -72,6 +74,8 @@ $(document).ready(function () {
                 console.log(href);
                 console.log("Success!");
                 $('.page-content').html(data);
+                seconds = 0;
+                ticking = false;
                 off()
             },
             error: function () {
