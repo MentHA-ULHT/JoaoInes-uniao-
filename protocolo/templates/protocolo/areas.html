@@ -15,8 +15,6 @@
                             data-href="{% url 'report' resolution %}"
                             style="max-width:300px; margin-right: 25px;"><i
                             class="fas fa-download fa-sm text-white-50"></i>&nbsp;Gerar Relatório</a>
-
-
                     </div>
                     <div class="card-body">
                         <div class="table-responsive table mt-2" id="dataTable" role="grid"
@@ -35,8 +33,11 @@
                                     {% for area,answered,percentage in areas %}
                                         <!-- Name -->
                                         <td style="margin-top: 0px;padding-bottom: 0px;">
+                                        <a href="#" class="jq-btn no-decor"
+                                               data-href="{% url 'instruments' protocol.id part.id area.id patient.id %}">
                                             <p style="margin-top: 10px;">
                                                 {{ area.order }}. {{ area.name }}</p>
+                                            </a>
                                         </td>
 
                                         <!-- Progress Bar -->

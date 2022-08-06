@@ -33,11 +33,14 @@
                                     {% for part,answered,percentage in parts %}
                                         <!-- Name -->
                                         <td style="margin-top: 0px;padding-bottom: 0px;">
+                                        <a href="#" class="jq-btn no-decor"
+                                               data-href="{% url 'areas' protocol.id part.id patient.id %}">
                                             <p style="margin-top: 10px;">{% if part.part_number > 0 %}
                                                 Parte {{ part.part_number }}: {{ part.name }}
                                             {% else %}
                                                 {{ part.name }}
                                             {% endif %}</p>
+                                        </a>
                                         </td>
 
                                         <!-- Progress Bar -->

@@ -33,8 +33,11 @@
                                     {% for instrument,answered,percentage in instruments %}
                                         <!-- Name -->
                                         <td style="margin-top: 0px;padding-bottom: 0px;">
+                                        <a href="#" class="jq-btn no-decor"
+                                               data-href="{% url 'dimensions' protocol.id part.id area.id instrument.id patient.id %}">
                                             <p style="margin-top: 10px;">
                                                 {{ instrument.order }}. {{ instrument.name }}</p>
+                                            </a>
                                         </td>
 
                                         <!-- Progress Bar -->

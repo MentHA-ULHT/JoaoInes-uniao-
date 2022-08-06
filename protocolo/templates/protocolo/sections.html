@@ -33,8 +33,11 @@
                                     {% for section,answered,percentage in sections %}
                                         <!-- Name -->
                                         <td style="margin-top: 0px;padding-bottom: 0px;">
+                                        <a href="#" class="jq-btn no-decor"
+                                               data-href="{% url 'question' protocol.id part.id area.id instrument.id dimension.id section.id patient.id %}">
                                             <p style="margin-top: 10px;">
                                                 {{ section.order }}. {{ section.name }}</p>
+                                            </a>
                                         </td>
 
                                         <!-- Progress Bar -->

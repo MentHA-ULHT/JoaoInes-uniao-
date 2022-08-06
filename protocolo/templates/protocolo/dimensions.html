@@ -33,8 +33,11 @@
                                     {% for dimension,answered,percentage in dimensions %}
                                         <!-- Name -->
                                         <td style="margin-top: 0px;padding-bottom: 0px;">
+                                        <a href="#" class="jq-btn no-decor"
+                                               data-href="{% url 'sections' protocol.id part.id area.id instrument.id dimension.id patient.id%}">
                                             <p style="margin-top: 10px;">
                                                 {{ dimension.order }}. {{ dimension.name }}</p>
+                                            </a>
                                         </td>
 
                                         <!-- Progress Bar -->
