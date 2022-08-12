@@ -110,6 +110,21 @@ class Instrument(Common):
 
         return count
 
+    @property
+    def maximum_quotation(self):
+        questions = Question.objects.all()
+        max_q = 0
+        dimensions = Dimension.objects.filter(instrument=self)
+        sections = []
+        for sec in Section.objects.all():
+            if sec.dimension in dimensions:
+                sections.append(sec)
+
+        for q in questions:
+            if q.section in sections:
+                max_q = max_q + q.quotation_max
+
+        return max_q
 
 class Dimension(Common):
     instrument = models.ForeignKey('Instrument', on_delete=models.CASCADE)
@@ -127,6 +142,18 @@ class Dimension(Common):
 
         return count
 
+    @property
+    def maximum_quotation(self):
+        questions = Question.objects.all()
+        sections = Section.objects.filter(dimension=self)
+        max_q = 0
+
+        for q in questions:
+            if q.section in sections:
+                max_q = max_q + q.quotation_max
+
+        return max_q
+
     def __str__(self):
         return f"{self.instrument.name} >> {self.name}"
 
@@ -137,6 +164,17 @@ class Section(Common):
     @property
     def number_of_questions(self):
         return len(Question.objects.filter(section=self.id))
+
+    @property
+    def maximum_quotation(self):
+        questions = Question.objects.all()
+        max_q = 0
+
+        for q in questions:
+            if q.section == self :
+                max_q = max_q + q.quotation_max
+
+        return max_q
 
     def __str__(self):
         return f"{self.dimension.instrument.name} >> {self.dimension.name} >> {self.name}"
@@ -166,6 +204,7 @@ class Question(Common):
                                               blank=True)
     quotation_max = models.IntegerField(default=10)
     quotation_min = models.IntegerField(default=0)
+    pdf_page = models.IntegerField(default=0)
 
     @property
     def allow_submission(self):
@@ -225,6 +264,7 @@ class Resolution(models.Model):
                 self.statistics[area.id][instrument.id]['name'] = instrument.name
                 self.statistics[area.id][instrument.id]['answered'] = 0
                 self.statistics[area.id][instrument.id]['percentage'] = 0
+                self.statistics[area.id][instrument.id]['quotation'] = 0
                 dimensions = Dimension.objects.filter(instrument=instrument)
                 for dimension in dimensions:
                     self.statistics[area.id][instrument.id][dimension.id] = {}
@@ -274,6 +314,7 @@ class Resolution(models.Model):
             percentage(total=dimension.number_of_questions,
                        partial=self.statistics[area_id][instrument_id][dimension_id]['answered'])
 
+
         section = Section.objects.get(pk=section_id)
         self.statistics[area_id][instrument_id][dimension_id][section_id]['answered'] += 1
         self.statistics[area_id][instrument_id][dimension_id][section_id]['percentage'] = \
@@ -285,6 +326,19 @@ class Resolution(models.Model):
     def change_quotation(self, area_id: int, instrument_id: int, dimension_id: int, section_id: int,
                          quotation: int):
         self.statistics[area_id][instrument_id][dimension_id][section_id]['quotation'] = quotation
+        answers = Answer.objects.filter(resolution=self)
+        q = 0
+        for a in answers:
+            if str(a.question.section.dimension.id) == dimension_id:
+                q = q + a.quotation
+        self.statistics[area_id][instrument_id][dimension_id]['quotation'] = q
+
+        q = 0
+        dims = Dimension.objects.filter(instrument=Instrument.objects.filter(id=instrument_id).get())
+        for a in answers:
+            if a.question.section.dimension in dims:
+                q = q + a.quotation
+        self.statistics[area_id][instrument_id]['quotation'] = q
         self.save()
 
     def decrement_statistics(self, part_id: int, area_id: int, instrument_id: int, dimension_id: int, section_id: int):

@@ -1,4 +1,4 @@
-console.log("jquery.js loaded")
+console.log("jquery.js loaded");
 $(document).ready(function () {
 
     $(document).on("click", ".report-button", function () {

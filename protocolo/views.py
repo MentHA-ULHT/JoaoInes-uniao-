@@ -15,19 +15,40 @@ import pandas as pd
 
 
 # Create your views here.
+@login_required(login_url='/login/')
 def dashboard_view(request):
     return render(request, 'protocolo/dashboard.html')
 
-
+@login_required(login_url='/login/')
 def dashboard_content_view(request):
     return render(request, 'protocolo/dashboardcontent.html')
 
-
+@login_required(login_url='/login/')
 def protocolos_view(request):
+    inst = Instrument.objects.filter(name="HADS").get()
+    qs = []
+    for d in Dimension.objects.all():
+        if d.instrument == inst:
+            for s in Section.objects.all():
+                if s.dimension == d:
+                    for q in Question.objects.all():
+                        if q.section == s:
+                            qs.append(q)
+
+    #q = Question.objects.filter(section=sect)#.update(pdf_page=33)
+    print(f"Found {len(qs)} questions")
+    print(qs)
+    for q in qs:
+        q.pdf_page = 39
+        q.quotation_max=5
+        q.save()
+
+
+
     context = {'protocolos': Protocol.objects.all().order_by('order')}
     return render(request, 'protocolo/protocolos.html', context)
 
-
+@login_required(login_url='/login/')
 def parts_view(request, protocol_id, patient_id):
     protocol = Protocol.objects.get(pk=protocol_id)
     resolutions = Resolution.objects.filter(doctor=request.user, patient=Participante.objects.filter(
@@ -58,7 +79,7 @@ def parts_view(request, protocol_id, patient_id):
     }
     return render(request, 'protocolo/parts.html', context)
 
-
+@login_required(login_url='/login/')
 def areas_view(request, protocol_id, part_id, patient_id):
     protocol = Protocol.objects.get(pk=protocol_id)
     part = Part.objects.get(pk=part_id)
@@ -95,7 +116,7 @@ def areas_view(request, protocol_id, part_id, patient_id):
     }
     return render(request, 'protocolo/areas.html', context)
 
-
+@login_required(login_url='/login/')
 def instruments_view(request, protocol_id, part_id, area_id, patient_id):
     protocol = Protocol.objects.get(pk=protocol_id)
     part = Part.objects.get(pk=part_id)
@@ -109,11 +130,13 @@ def instruments_view(request, protocol_id, part_id, area_id, patient_id):
     # print_nested_dict(r.statistics, 0)
     answered_list = []
     percentage_list = []
+    quotation_list = []
     s = r.statistics
     for instrument in instruments:
         if s.get(f'{area.id}') is not None:
             answered_list.append(s.get(f'{area.id}').get(f'{instrument.id}').get('answered'))
             percentage_list.append(s.get(f'{area.id}').get(f'{instrument.id}').get('percentage'))
+            quotation_list.append(s.get(f'{area.id}').get(f'{instrument.id}').get('quotation'))
     # print(answered_list)
     # print(percentage_list)
 
@@ -121,14 +144,14 @@ def instruments_view(request, protocol_id, part_id, area_id, patient_id):
         'area': area,
         'part': part,
         'protocol': protocol,
-        'instruments': zip(instruments, answered_list, percentage_list),
+        'instruments': zip(instruments, answered_list, percentage_list, quotation_list),
         'resolution': r.id,
         'patient': patient,
     }
 
     return render(request, 'protocolo/instruments.html', context)
 
-
+@login_required(login_url='/login/')
 def dimensions_view(request, protocol_id, part_id, area_id, instrument_id, patient_id):
     protocol = Protocol.objects.get(pk=protocol_id)
     part = Part.objects.get(pk=part_id)
@@ -142,14 +165,18 @@ def dimensions_view(request, protocol_id, part_id, area_id, instrument_id, patie
 
     # statistics
     r = Resolution.objects.get(patient=patient, doctor=request.user, part=part)
-    # print_nested_dict(r.statistics, 0)
+    #print_nested_dict(r.statistics.get(str(area.id)).get(str(instrument.id)))
+    #print(r.statistics.get(str(area.id)).get(str(instrument.id)).get('9').get('quotation'))
+
     answered_list = []
     percentage_list = []
+    quotation_list = []
     s = r.statistics
     for dimension in dimensions:
         if s.get(f'{area.id}') is not None:
             answered_list.append(s.get(f'{area.id}').get(f'{instrument.id}').get(f'{dimension.id}').get('answered'))
             percentage_list.append(s.get(f'{area.id}').get(f'{instrument.id}').get(f'{dimension.id}').get('percentage'))
+            quotation_list.append(s.get(f'{area.id}').get(f'{instrument.id}').get(f'{dimension.id}').get('quotation'))
     # print(answered_list)
     # print(percentage_list)
 
@@ -158,13 +185,13 @@ def dimensions_view(request, protocol_id, part_id, area_id, instrument_id, patie
         'part': part,
         'protocol': protocol,
         'instrument': instrument,
-        'dimensions': zip(dimensions, answered_list, percentage_list),
+        'dimensions': zip(dimensions, answered_list, percentage_list, quotation_list),
         'resolution': r.id,
         'patient': patient,
     }
     return render(request, 'protocolo/dimensions.html', context)
 
-
+@login_required(login_url='/login/')
 def sections_view(request, protocol_id, part_id, area_id, instrument_id, dimension_id, patient_id):
     protocol = Protocol.objects.get(pk=protocol_id)
     part = Part.objects.get(pk=part_id)
@@ -183,6 +210,7 @@ def sections_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
     # print_nested_dict(r.statistics, 0)
     answered_list = []
     percentage_list = []
+    quotation_list = []
     s = r.statistics
     for section in sections:
         if s.get(f'{area.id}') is not None:
@@ -191,6 +219,10 @@ def sections_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
             percentage_list.append(
                 s.get(f'{area.id}').get(f'{instrument.id}').get(f'{dimension.id}').get(f'{section.id}').get(
                     'percentage'))
+            quotation_list.append(
+                s.get(f'{area.id}').get(f'{instrument.id}').get(f'{dimension.id}').get(f'{section.id}').get(
+                    'quotation'))
+
     # print(answered_list)
     # print(percentage_list)
 
@@ -203,7 +235,7 @@ def sections_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
         'protocol': protocol,
         'instrument': instrument,
         'dimension': dimension,
-        'sections': zip(sections, answered_list, percentage_list),
+        'sections': zip(sections, answered_list, percentage_list, quotation_list),
         'resolution': r.id,
         'patient': patient,
     }
@@ -212,7 +244,7 @@ def sections_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
 
     return render(request, 'protocolo/sections.html', context)
 
-
+@login_required(login_url='/login/')
 def question_view(request, protocol_id, part_id, area_id, instrument_id, dimension_id, section_id, patient_id):
     protocol = Protocol.objects.get(pk=protocol_id)
     part = Part.objects.get(pk=part_id)
@@ -240,7 +272,7 @@ def question_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
         'patient': patient,
     }
 
-    print(answers)
+    #print(answers)
 
     if question.question_type == 3:
         question_list = []
@@ -441,7 +473,7 @@ def question_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
                             patient_id=patient_id)
 
         elif question.question_type == 5:
-            print(request.POST)
+            #print(request.POST)
             existing = False
             if len(Answer.objects.filter(question=question, resolution=r)) >= 1:
                 a = Answer.objects.filter(question=question, resolution=r).get()
@@ -456,7 +488,7 @@ def question_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
             for i in range(1, 5):
                 text_area = request.POST.get(str(i))
                 counter += len(text_area.split(","))
-                print(text_area)
+                #print(text_area)
                 ti = TextInputAnswer()
                 ti.answer = a
                 ti.seconds = i
@@ -482,7 +514,7 @@ def question_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
 
     return render(request, 'protocolo/question.html', context)
 
-
+@login_required(login_url='/login/')
 def calculate_timer_quotation(question, i):
     if not "Animais" in question.name:
         if i < 2:
@@ -520,16 +552,16 @@ def calculate_timer_quotation(question, i):
             return 7
 
 
-
+@login_required(login_url='/login/')
 def report_view(request, resolution_id):
     r = Resolution.objects.get(pk=resolution_id)
-    print(r)
+    #print(r)
     # É necessário o ensure_ascii = False para mostrar caracteres UTF-8
     report_json = r.statistics
     report_json_dumps = json.dumps(report_json, indent=1, sort_keys=False, ensure_ascii=False)
     report = {}
     answers = Answer.objects.filter(resolution=r)
-    print(answers)
+    #print(answers)
 
     for area in Area.objects.filter(part=r.part):
         report[area.name] = {}
@@ -602,7 +634,7 @@ def report_view(request, resolution_id):
 
     return render(request, 'protocolo/report.html', context)
 
-
+@login_required(login_url='/login/')
 def protocol_participants_view(request, protocol_id):
     doctor = request.user
     protocolo = Protocol.objects.get(pk=protocol_id)
@@ -640,8 +672,6 @@ def login_view(request):
 
 
 from django.contrib.auth import logout
-
-
 def logout_view(request):
     logout(request)
 
@@ -658,7 +688,7 @@ def profile_view(request, participant_id):
 
     cuidadores = ", ".join(c)
 
-    print(cuidadores)
+    #print(cuidadores)
     context = {
         'p': p,
         'cuidadores': cuidadores,

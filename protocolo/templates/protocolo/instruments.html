@@ -1,3 +1,4 @@
+{% load tags %}
 <div id="wrapper">
     <div class="d-flex flex-column" id="content-wrapper">
         <div id="content">
@@ -30,13 +31,13 @@
                                 <tbody>
                                 <tr>
                                     <!-- Iteration -->
-                                    {% for instrument,answered,percentage in instruments %}
+                                    {% for instrument,answered,percentage,quotation in instruments %}
                                         <!-- Name -->
                                         <td style="margin-top: 0px;padding-bottom: 0px;">
                                         <a href="#" class="jq-btn no-decor"
                                                data-href="{% url 'dimensions' protocol.id part.id area.id instrument.id patient.id %}">
                                             <p style="margin-top: 10px;">
-                                                {{ instrument.order }}. {{ instrument.name }}</p>
+                                                {{ instrument.order }}. {{ instrument.name }}  <span class="tree-quotation">({% minimum quotation instrument.maximum_quotation %}/{{ instrument.maximum_quotation }})</span></p>
                                             </a>
                                         </td>
 

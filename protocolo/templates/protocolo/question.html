@@ -1,4 +1,5 @@
 {% load markdownify %}
+{% load static %}
 <div id="wrapper">
     <div class="d-flex flex-column" id="content-wrapper">
         <div id="content">
@@ -28,8 +29,13 @@
                         {% endif %}
                         {% if question.instruction %}
                             <div class="instruction"
-                                 style="border-radius: 10px;background-color: rgba(190,190,190,0.16); padding: 5px 10px 1px 10px">
-                                <b>Instrução:</b> {{ question.instruction | markdownify }}
+                                 style="border-radius: 10px;background-color: rgba(190,190,190,0.16); padding: 5px 10px 1px 10px;display: flex;flex-direction: row;justify-content: space-between;">
+                                <div class="lef"><b>Instrução:</b> {{ question.instruction | markdownify }}</div>
+                                <div class="right">
+                                    <a href="{% static 'protocolo/files/MentHA_Manual_Avaliacao_Final.pdf' %}#page={{ question.pdf_page }}"  target="_blank">
+                                                    <i style="padding:5px;color: var(--bs-body-color);font-size: 35px;" class="fa fa-question"></i>
+                                    </a>
+                                </div>
                             </div>
                         {% endif %}
                         {% if question.helping_images.all %}
