@@ -303,7 +303,7 @@ def question_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
         if answer.resolution == r:
             if answer.question == question:
                 if answer.multiple_choice_answer is not None:
-                    existing_answer_id.apped(answer.multiple_choice_answer.id)
+                    existing_answer_id.append(answer.multiple_choice_answer.id)
                     context['existing_answer_id'] = existing_answer_id
                 if answer.text_answer is not None:
                     form.initial.update({'text_answer': answer.text_answer})

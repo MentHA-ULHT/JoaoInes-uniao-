@@ -1,17 +1,6 @@
 console.log("jquery.js loaded");
 $(document).ready(function () {
 
-    $(document).on("click", ".report-button", function () {
-        document.getElementById("overlay").style.display = "flex";
-        document.getElementById("overlay").style.zIndex = "100";
-    })
-
-
-    function off() {
-        document.getElementById("overlay").style.display = "none";
-        document.getElementById("overlay").style.zIndex = "2";
-    }
-
     var seconds = 0;
     var ticking = false;
 
@@ -57,6 +46,7 @@ $(document).ready(function () {
     });
 
     $(document).on("click", ".jq-btn", function () {
+        NProgress.start()
         element = $(this)
         var href = element.attr("data-href");
         last_url = href;
@@ -76,7 +66,7 @@ $(document).ready(function () {
                 $('.page-content').html(data);
                 seconds = 0;
                 ticking = false;
-                off()
+                NProgress.done(true)
             },
             error: function () {
                 console.log("Error!");

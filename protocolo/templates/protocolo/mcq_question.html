@@ -5,7 +5,7 @@
         {% for answer in question.possible_answers.all %}
             <label>
                 <input class="" id="{{ answer.id }}" name="choice" type="radio" value="{{ answer.id }}"
-                        {% if answer.id == existing_answer_id %}
+                        {% if answer.id in existing_answer_id %}
                        checked="checked"
                         {% endif %}
                 />
