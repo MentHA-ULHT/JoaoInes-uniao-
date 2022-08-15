@@ -15,15 +15,15 @@ import pandas as pd
 
 
 # Create your views here.
-@login_required(login_url='/login/')
+@login_required(login_url='login')
 def dashboard_view(request):
     return render(request, 'protocolo/dashboard.html')
 
-@login_required(login_url='/login/')
+@login_required(login_url='login')
 def dashboard_content_view(request):
     return render(request, 'protocolo/dashboardcontent.html')
 
-@login_required(login_url='/login/')
+@login_required(login_url='login')
 def protocolos_view(request):
     inst = Instrument.objects.filter(name="HADS").get()
     qs = []
@@ -48,7 +48,7 @@ def protocolos_view(request):
     context = {'protocolos': Protocol.objects.all().order_by('order')}
     return render(request, 'protocolo/protocolos.html', context)
 
-@login_required(login_url='/login/')
+@login_required(login_url='login')
 def parts_view(request, protocol_id, patient_id):
     protocol = Protocol.objects.get(pk=protocol_id)
     resolutions = Resolution.objects.filter(doctor=request.user, patient=Participante.objects.filter(
@@ -79,7 +79,7 @@ def parts_view(request, protocol_id, patient_id):
     }
     return render(request, 'protocolo/parts.html', context)
 
-@login_required(login_url='/login/')
+@login_required(login_url='login')
 def areas_view(request, protocol_id, part_id, patient_id):
     protocol = Protocol.objects.get(pk=protocol_id)
     part = Part.objects.get(pk=part_id)
@@ -116,7 +116,7 @@ def areas_view(request, protocol_id, part_id, patient_id):
     }
     return render(request, 'protocolo/areas.html', context)
 
-@login_required(login_url='/login/')
+@login_required(login_url='login')
 def instruments_view(request, protocol_id, part_id, area_id, patient_id):
     protocol = Protocol.objects.get(pk=protocol_id)
     part = Part.objects.get(pk=part_id)
@@ -151,7 +151,7 @@ def instruments_view(request, protocol_id, part_id, area_id, patient_id):
 
     return render(request, 'protocolo/instruments.html', context)
 
-@login_required(login_url='/login/')
+@login_required(login_url='login')
 def dimensions_view(request, protocol_id, part_id, area_id, instrument_id, patient_id):
     protocol = Protocol.objects.get(pk=protocol_id)
     part = Part.objects.get(pk=part_id)
@@ -191,7 +191,7 @@ def dimensions_view(request, protocol_id, part_id, area_id, instrument_id, patie
     }
     return render(request, 'protocolo/dimensions.html', context)
 
-@login_required(login_url='/login/')
+@login_required(login_url='login')
 def sections_view(request, protocol_id, part_id, area_id, instrument_id, dimension_id, patient_id):
     protocol = Protocol.objects.get(pk=protocol_id)
     part = Part.objects.get(pk=part_id)
@@ -244,7 +244,7 @@ def sections_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
 
     return render(request, 'protocolo/sections.html', context)
 
-@login_required(login_url='/login/')
+@login_required(login_url='login')
 def question_view(request, protocol_id, part_id, area_id, instrument_id, dimension_id, section_id, patient_id):
     protocol = Protocol.objects.get(pk=protocol_id)
     part = Part.objects.get(pk=part_id)
@@ -514,7 +514,7 @@ def question_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
 
     return render(request, 'protocolo/question.html', context)
 
-@login_required(login_url='/login/')
+@login_required(login_url='login')
 def calculate_timer_quotation(question, i):
     if not "Animais" in question.name:
         if i < 2:
@@ -552,7 +552,7 @@ def calculate_timer_quotation(question, i):
             return 7
 
 
-@login_required(login_url='/login/')
+@login_required(login_url='login')
 def report_view(request, resolution_id):
     r = Resolution.objects.get(pk=resolution_id)
     #print(r)
@@ -634,7 +634,7 @@ def report_view(request, resolution_id):
 
     return render(request, 'protocolo/report.html', context)
 
-@login_required(login_url='/login/')
+@login_required(login_url='login')
 def protocol_participants_view(request, protocol_id):
     doctor = request.user
     protocolo = Protocol.objects.get(pk=protocol_id)
@@ -647,7 +647,7 @@ def protocol_participants_view(request, protocol_id):
     return render(request, 'protocolo/protocol-participants.html', context)
 
 
-@login_required(login_url='/login/')
+@login_required(login_url='login')
 def participants_view(request):
     doctor = request.user
     participants = Participante.objects.filter(avaliador=doctor)

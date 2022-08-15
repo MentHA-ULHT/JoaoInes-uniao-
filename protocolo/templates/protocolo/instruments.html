@@ -23,8 +23,9 @@
                             <table class="table my-0" id="dataTable">
                                 <thead>
                                 <tr>
-                                    <th style="text-align: left;width: 44%">Nome</th>
-                                    <th style="text-align: left;width: 33%">Progresso</th>
+                                    <th style="text-align: left;width: 29%">Nome</th>
+                                    <th style="text-align: left;width: 15%">Cotação</th>
+                                    <th style="text-align: left;width: 25%">Progresso</th>
                                     <th style="text-align: center;"></th>
                                 </tr>
                                 </thead>
@@ -37,8 +38,12 @@
                                         <a href="#" class="jq-btn no-decor"
                                                data-href="{% url 'dimensions' protocol.id part.id area.id instrument.id patient.id %}">
                                             <p style="margin-top: 10px;">
-                                                {{ instrument.order }}. {{ instrument.name }}  <span class="tree-quotation">({% minimum quotation instrument.maximum_quotation %}/{{ instrument.maximum_quotation }})</span></p>
+                                                {{ instrument.order }}. {{ instrument.name }}</p>
                                             </a>
+                                        </td>
+                                        <!-- Quotation -->
+                                        <td>
+                                        <span class="tree-quotation">({% minimum quotation instrument.maximum_quotation %}/{{ instrument.maximum_quotation }})</span>
                                         </td>
 
                                         <!-- Progress Bar -->

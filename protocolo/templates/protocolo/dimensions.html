@@ -3,10 +3,6 @@
     <div class="d-flex flex-column" id="content-wrapper">
         <div id="content">
             <div class="d-sm-flex justify-content-between align-items-center mb-4">
-
-
-
-
             </div>
             <div class="container-fluid">
                 <div class="card shadow">
@@ -23,8 +19,9 @@
                             <table class="table my-0" id="dataTable">
                                 <thead>
                                 <tr>
-                                    <th style="text-align: left;width: 44%">Nome</th>
-                                    <th style="text-align: left;width: 33%">Progresso</th>
+                                    <th style="text-align: left;width: 29%">Nome</th>
+                                    <th style="text-align: left;width: 15%">Cotação</th>
+                                    <th style="text-align: left;width: 25%">Progresso</th>
                                     <th style="text-align: center;"></th>
                                 </tr>
                                 </thead>
@@ -37,8 +34,13 @@
                                         <a href="#" class="jq-btn no-decor"
                                                data-href="{% url 'sections' protocol.id part.id area.id instrument.id dimension.id patient.id%}">
                                             <p style="margin-top: 10px;">
-                                                {{ dimension.order }}. {{ dimension.name }}  <span class="tree-quotation">({% minimum quotation dimension.maximum_quotation %}/{{ dimension.maximum_quotation }})</span></p>
+                                                {{ dimension.order }}. {{ dimension.name }}</p>
                                             </a>
+                                        </td>
+
+                                         <!-- Quotation -->
+                                        <td>
+                                            <span class="tree-quotation">({% minimum quotation dimension.maximum_quotation %}/{{ dimension.maximum_quotation }})</span>
                                         </td>
 
                                         <!-- Progress Bar -->
