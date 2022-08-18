@@ -19,6 +19,14 @@ $(document).ready(function () {
     }
 
     $(document).on("click", ".btn-timer", function () {
+        ico = $('#timer-ico');
+        if (ico.hasClass('fa-pause')){
+            ico.removeClass('fa-pause');
+            ico.addClass('fa-play');
+        } else {
+            ico.addClass('fa-pause');
+            ico.removeClass('fa-play');
+        }
         ticking = (ticking == true) ? false : true
         tick();
     })
