@@ -426,7 +426,7 @@ def question_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
                             protocol_id=protocol_id, part_id=part_id,
                             area_id=area_id, patient_id=patient_id)
 
-        elif question.question_type == 4:
+        elif question.question_type == 4 or question.question_type == 6 or question.question_type == 7:
             existing = False
             if len(Answer.objects.filter(question=question, resolution=r)) >= 1:
                 a = Answer.objects.filter(question=question, resolution=r).get()
@@ -471,7 +471,6 @@ def question_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
                             protocol_id=protocol_id, part_id=part_id,
                             area_id=area_id, instrument_id=instrument_id, dimension_id=dimension_id,
                             patient_id=patient_id)
-
         elif question.question_type == 5:
             #print(request.POST)
             existing = False

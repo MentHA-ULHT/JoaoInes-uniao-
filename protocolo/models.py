@@ -14,6 +14,7 @@ MEDIUM_LEN = 150
 LONG_LEN = 500
 
 HELPING_IMAGES_DIR = "helping_images/"
+PA_IMAGES_DIR = "possible_answers_images/"
 
 
 # É possivel criar um modelo "Common"
@@ -182,10 +183,10 @@ class Section(Common):
 
 class Question(Common):
     #1 = Multiple Choice, 2 = Escrita aberta ou submissão, 3 = Tabela de escolhas multiplas (p. ex. Psicossintomatologia BSI)
-    #4 = Checkboxes 5 = Multiplas text areas com cronómetro
+    #4 = Checkboxes, 5 = Multiplas text areas com cronómetro, 6 = Nomeação de Imagens, 7= Memoria (Reconhecimento)
     question_type = models.PositiveIntegerField(default=1,
                                         blank=False,
-                                        validators=[MinValueValidator(1), MaxValueValidator(5)])
+                                        validators=[MinValueValidator(1), MaxValueValidator(7)])
     instruction = models.TextField(max_length=LONG_LEN,
                                    blank=True)
     evaluation_scale = models.CharField(max_length=LONG_LEN,
@@ -230,6 +231,9 @@ class QuestionImage(models.Model):
 
 class PossibleAnswer(Common):
     quotation = models.IntegerField(default=0)
+    image = models.ImageField(upload_to=PA_IMAGES_DIR,
+                              default=None,
+                              blank=True, null=True)
 
     def __str__(self):
         return f"{self.name}"
