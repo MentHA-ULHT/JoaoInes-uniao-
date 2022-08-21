@@ -11,7 +11,7 @@ from diario.models import *
 
 SMALL_LEN = 50
 MEDIUM_LEN = 150
-LONG_LEN = 500
+LONG_LEN = 750
 
 HELPING_IMAGES_DIR = "helping_images/"
 PA_IMAGES_DIR = "possible_answers_images/"
