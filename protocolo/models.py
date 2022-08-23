@@ -10,8 +10,8 @@ from diario.models import *
 # Create your models here.
 
 SMALL_LEN = 50
-MEDIUM_LEN = 150
-LONG_LEN = 750
+MEDIUM_LEN = 250
+LONG_LEN = 1000
 
 HELPING_IMAGES_DIR = "helping_images/"
 PA_IMAGES_DIR = "possible_answers_images/"
@@ -183,16 +183,13 @@ class Section(Common):
 
 class Question(Common):
     #1 = Multiple Choice, 2 = Escrita aberta ou submissão, 3 = Tabela de escolhas multiplas (p. ex. Psicossintomatologia BSI)
-    #4 = Checkboxes, 5 = Multiplas text areas com cronómetro, 6 = Nomeação de Imagens, 7= Memoria (Reconhecimento)
+    #4 = Checkboxes, 5 = Multiplas text areas com cronómetro, 6 = Nomeação de Imagens, 7= Memoria (Reconhecimento),
+    #8 = GDS Questionário, #9 GDS atribuir estadio
     question_type = models.PositiveIntegerField(default=1,
                                         blank=False,
-                                        validators=[MinValueValidator(1), MaxValueValidator(7)])
+                                        validators=[MinValueValidator(1), MaxValueValidator(9)])
     instruction = models.TextField(max_length=LONG_LEN,
                                    blank=True)
-    evaluation_scale = models.CharField(max_length=LONG_LEN,
-                                        blank=True,
-                                        default="",
-                                        null=True)
     helping_images = models.ManyToManyField('QuestionImage',
                                             default=None,
                                             related_name='images',

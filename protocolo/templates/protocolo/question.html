@@ -64,6 +64,10 @@
                             {% include 'protocolo/nomination_question.html' %}
                         {% elif question.question_type == 7 %}
                             {% include 'protocolo/memory_question.html' %}
+                        {% elif question.question_type == 8 %}
+                            {% include 'protocolo/gds_questionnaire_question.html' %}
+                        {% elif question.question_type == 9 %}
+                            {% include 'protocolo/gds_question.html' %}
                         {% endif %}
 
                     </div>

@@ -109,8 +109,22 @@
     margin-bottom: .5rem;
 }
 
+.estadio-level {
+    text-align: center;
+    font-weight: bold;
+    font-size: 2em;
+    margin-top:auto;
+    color:var(--bs-blue);
+    vertical-align:middle;
+}
+
 .breadcrumb {
     margin-bottom: 1rem;
+}
+
+.standard-text{
+    font-weight: normal;
+    color: rgb(133,135,150);
 }
 
 

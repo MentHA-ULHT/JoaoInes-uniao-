@@ -252,12 +252,13 @@ def question_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
     instrument = Instrument.objects.get(pk=instrument_id)
     dimension = Dimension.objects.get(pk=dimension_id)
     section = Section.objects.get(pk=section_id)
-    question = Question.objects.filter(section=section.id).first()
+    question = Question.objects.filter(section=section).first()
     form = uploadAnswerForm(request.POST or None)
     patient = Participante.objects.get(pk=patient_id)
     r = Resolution.objects.get(patient=patient, doctor=request.user, part=part)
     answers = Answer.objects.filter(resolution=r)
-
+    #print(question.section.number_of_questions)
+    #print(question.section.dimension.number_of_questions)
     context = {
         'area': area,
         'part': part,
@@ -271,7 +272,6 @@ def question_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
         'answers': answers,
         'patient': patient,
     }
-
     #print(answers)
 
     if question.question_type == 3:
@@ -327,7 +327,7 @@ def question_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
             if answer.question == question:
                 existing_answer = answer
 
-        if question.question_type == 1:
+        if question.question_type == 1 or question.question_type == 9:
             id_answer = request.POST.get("choice")
             r = Resolution.objects.get(part=part,
                                        patient=patient, doctor=request.user)
@@ -353,11 +353,7 @@ def question_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
                 existing_answer.save()
                 r.change_quotation(f'{area_id}', f'{instrument_id}', f'{dimension_id}',
                                    f'{section_id}', quotation)
-            # quando guarda a pergunta volta às secções
-            return redirect('sections',
-                            protocol_id=protocol_id, part_id=part_id,
-                            area_id=area_id, instrument_id=instrument_id,
-                            dimension_id=dimension_id, patient_id=patient_id)
+
 
         elif question.question_type == 2:
             form = uploadAnswerForm(request.POST, files=request.FILES)
@@ -386,11 +382,6 @@ def question_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
 
                 r.change_quotation(f'{area_id}', f'{instrument_id}', f'{dimension_id}',
                                    f'{section_id}', new_answer.quotation)
-                # quando guarda a pergunta volta às secções
-                return redirect('sections',
-                                protocol_id=protocol_id, part_id=part_id,
-                                area_id=area_id, instrument_id=instrument_id,
-                                dimension_id=dimension_id, patient_id=patient_id)
 
         elif question.question_type == 3:
             for key in request.POST:
@@ -422,11 +413,8 @@ def question_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
                                                f'{section_id}')
                         r.change_quotation(f'{area_id}', f'{instrument_id}', f'{dimension_id}',
                                            f'{section_id}', quotation)
-            return redirect('instruments',
-                            protocol_id=protocol_id, part_id=part_id,
-                            area_id=area_id, patient_id=patient_id)
 
-        elif question.question_type == 4 or question.question_type == 6 or question.question_type == 7:
+        elif question.question_type == 4 or question.question_type == 6 or question.question_type == 7 or question.question_type == 8:
             existing = False
             if len(Answer.objects.filter(question=question, resolution=r)) >= 1:
                 a = Answer.objects.filter(question=question, resolution=r).get()
@@ -467,10 +455,6 @@ def question_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
                 r.change_quotation(f'{area_id}', f'{instrument_id}', f'{dimension_id}',
                                    f'{section_id}', q)
 
-            return redirect('sections',
-                            protocol_id=protocol_id, part_id=part_id,
-                            area_id=area_id, instrument_id=instrument_id, dimension_id=dimension_id,
-                            patient_id=patient_id)
         elif question.question_type == 5:
             #print(request.POST)
             existing = False
@@ -505,11 +489,21 @@ def question_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
                                        f'{section_id}')
                 r.change_quotation(f'{area_id}', f'{instrument_id}', f'{dimension_id}',
                                    f'{section_id}', q)
-
-            return redirect('sections',
+        print(question.section.dimension.number_of_questions)
+        if question.question_type == 3:
+            return redirect('instruments',
                             protocol_id=protocol_id, part_id=part_id,
-                            area_id=area_id, instrument_id=instrument_id, dimension_id=dimension_id,
-                            patient_id=patient_id)
+                            area_id=area_id, patient_id=patient_id)
+        elif question.section.dimension.number_of_questions > 1:
+            return redirect('sections',
+                        protocol_id=protocol_id, part_id=part_id,
+                        area_id=area_id, instrument_id=instrument_id, dimension_id=dimension_id,
+                        patient_id=patient_id)
+        elif question.section.dimension.number_of_questions < 1:
+            return redirect('dimensions',
+                            protocol_id=protocol_id, part_id=part_id,
+                            area_id=area_id, instrument_id=instrument_id, patient_id=patient_id)
+
 
     return render(request, 'protocolo/question.html', context)
 

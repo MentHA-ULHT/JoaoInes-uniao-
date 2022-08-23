@@ -136,8 +136,20 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #Markdownify
 
 MARKDOWNIFY_STRIP = False
-MARKDOWNIFY_WHITELIST_TAGS = {
- 'a', 'p',
- 'h1', 'h2','h3','h4', 'h5', 'h6', 'h7',
- 'ul', 'li', 'span',
+MARKDOWNIFY = {
+   "default": {
+      "WHITELIST_TAGS": [
+        'a', 'abbr', 'acronym',
+        'strong', 'b',
+        'blockquote', 'em', 'i',
+        'ul', 'li', 'ol',
+        'p',
+        'h1', 'h2', 'h3', 'h4',
+      ]
+   },
+
+   "alternative": {
+      "WHITELIST_TAGS": ["a", "p"],
+      "MARKDOWN_EXTENSIONS": ["markdown.extensions.fenced_code", ]
+   }
 }
