@@ -553,7 +553,7 @@ def report_view(request, resolution_id):
     report_json = r.statistics
     report_json_dumps = json.dumps(report_json, indent=1, sort_keys=False, ensure_ascii=False)
     report = {}
-    answers = Answer.objects.filter(resolution=r)
+    answers = Answer.objects.filter(resolution=r).order_by("question__section__order")
     #print(answers)
 
     for area in Area.objects.filter(part=r.part):

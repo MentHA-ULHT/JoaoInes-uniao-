@@ -1,3 +1,4 @@
+{% load tags %}
 <div id="wrapper">
     <div class="d-flex flex-column" id="content-wrapper">
         <div id="content">
@@ -6,96 +7,142 @@
                     <div class="card-header py-3">
                         <p class="text-primary m-0 fw-bold">Relatório {{ resolution.part }} - {{ resolution.patient }}
                             ({{ resolution.date }})</p>
-                        <div>
-                            {% for area, instrument in report.items %}
-                                <div style="padding-top:15px;">
-                                    <a class="btn btn-primary" data-bs-toggle="collapse" aria-expanded="true"
-                                       aria-controls="collapse-{{ area|cut:" " }}" href="#collapse-{{ area|cut:" " }}"
-                                       role="button"
-                                       style="min-width: 100%;text-align: left;padding-left: 15px"> {{ area }}
-                                    </a>
-                                </div>
 
-                                <div class="collapse" id="collapse-{{ area|cut:" " }}" style="padding-top: 10px">
-                                    <div class="table-responsive">
-                                        <table class="table">
-                                            <tbody>
-                                            {% for inst, dimension in instrument.items %}
-                                                <tr>
-                                                    <td style="width: 50%;margin-bottom: 0px;">
-                                                        <strong>Instrumento: </strong>
-                                                        <a href="#" class="jq-btn no-decor"
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th style="width: 20%;text-align: left;color: var(--bs-blue);">Área de Avaliação
+                                    </th>
+                                    <th style="text-align: left;color: var(--bs-blue);">Resultados</th>
+                                    <th style="text-align: left;color: var(--bs-blue);"></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for area, instrument in report.items %}
+                                    <tr>
+                                        <!-- Área de Avaliação -->
+                                        <td>{{ area }}</td>
+                                        <!-- Resultados -->
+                                        <td>
+                                            <!-- Instrumentos -->
+                                            {% for instrument_name, dimension in instrument.items %}
+                                                <span class="fw-bold">
+                                                <a href="#" class="jq-btn no-decor"
+                                                        {% for i in instruments %}
+                                                            {% if i.name == instrument_name %}
+                                                   data-href="{% url 'dimensions' resolution.part.protocol.id resolution.part.id i.area.id i.id resolution.patient.id %}"
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                >{{ instrument_name }}</span>
+                                                    <svg style="margin-top: 0px;"
+                                                         xmlns="http://www.w3.org/2000/svg"
+                                                         width="16"
+                                                         height="16" fill="currentColor"
+                                                         class="bi bi-link" viewBox="0 0 16 16">
+                                                        <path d="M6.354 5.5H4a3 3 0 0 0 0 6h3a3 3 0 0 0 2.83-4H9c-.086 0-.17.01-.25.031A2 2 0 0 1 7 10.5H4a2 2 0 1 1 0-4h1.535c.218-.376.495-.714.82-1z"/>
+                                                        <path d="M9 5.5a3 3 0 0 0-2.83 4h1.098A2 2 0 0 1 9 6.5h3a2 2 0 1 1 0 4h-1.535a4.02 4.02 0 0 1-.82 1H12a3 3 0 1 0 0-6H9z"/>
+                                                    </svg>
+                                                </a>
+                                                {% if dimension.Total == 0 %}
+                                                    <ul class="list-group">
+                                                        <li><span class="text-warning fw-bold"> <i
+                                                                class="fa fa-warning"></i> Não Respondido</span></li>
+                                                    </ul>
+                                                    <br>
+                                                {% else %}
 
-                                                            {% for i in instruments %}
-                                                                {% if i.name == inst %}
-                                                                    data-href="{% url 'dimensions' resolution.part.protocol.id resolution.part.id i.area.id i.id resolution.patient.id %}"
+                                                    {% comment %}
+                                                (Cotação Total: {{ dimension.Total }})
+                                                {% endcomment %}
+                                                    <!-- CASOS ESPECIAIS -->
+                                                    <!-- PANAS -->
+                                                    {% if instrument_name == "PANAS" %}
+                                                        <ul class="list-group">
+                                                            {% for a in answers %}
+                                                                {% if a.instrument == "PANAS" %}
+                                                                    <li>
+                                                                        <a href="#"
+                                                                           data-href="{% url 'question' resolution.part.protocol.id resolution.part.id a.question.section.dimension.instrument.area.id a.question.section.dimension.instrument.id a.question.section.dimension.id a.question.section.id resolution.patient.id %}"
+                                                                           class="jq-btn no-decor">{{ a.question.name }}
+                                                                            <svg style="margin-top: 0px;"
+                                                                                 xmlns="http://www.w3.org/2000/svg"
+                                                                                 width="16"
+                                                                                 height="16" fill="currentColor"
+                                                                                 class="bi bi-link" viewBox="0 0 16 16">
+                                                                                <path d="M6.354 5.5H4a3 3 0 0 0 0 6h3a3 3 0 0 0 2.83-4H9c-.086 0-.17.01-.25.031A2 2 0 0 1 7 10.5H4a2 2 0 1 1 0-4h1.535c.218-.376.495-.714.82-1z"/>
+                                                                                <path d="M9 5.5a3 3 0 0 0-2.83 4h1.098A2 2 0 0 1 9 6.5h3a2 2 0 1 1 0 4h-1.535a4.02 4.02 0 0 1-.82 1H12a3 3 0 1 0 0-6H9z"/>
+                                                                            </svg>
+                                                                        </a>: <span class="fw-bold">{{ a.multiple_choice_answer.name }}</span></li>
                                                                 {% endif %}
                                                             {% endfor %}
-                                                        >
-                                                            {{ inst }}
-                                                            <svg style="margin-top: 0px;"
-                                                                 xmlns="http://www.w3.org/2000/svg"
-                                                                 width="16"
-                                                                 height="16" fill="currentColor"
-                                                                 class="bi bi-link" viewBox="0 0 16 16">
-                                                                <path d="M6.354 5.5H4a3 3 0 0 0 0 6h3a3 3 0 0 0 2.83-4H9c-.086 0-.17.01-.25.031A2 2 0 0 1 7 10.5H4a2 2 0 1 1 0-4h1.535c.218-.376.495-.714.82-1z"/>
-                                                                <path d="M9 5.5a3 3 0 0 0-2.83 4h1.098A2 2 0 0 1 9 6.5h3a2 2 0 1 1 0 4h-1.535a4.02 4.02 0 0 1-.82 1H12a3 3 0 1 0 0-6H9z"/>
-                                                            </svg>
-                                                        </a>
-
-                                                        ({{ dimension.Total }})
-                                                        <hr style="margin-top: 5px;margin-bottom: 5px;">
+                                                        </ul>
+                                                        <!-- ABVD - MDA -->
+                                                    {% elif instrument_name == "ABVD - MDA" %}
+                                                        <br>
+                                                        <span class="fw-bold">
+                                                         Grau de Dependência:
+                                                         <span class="text-{% if dimension.Total <= 7 %}success{% elif dimension.Total <= 14 %}warning{% elif dimension.Total <= 24 %}danger{% endif %}">
+                                                            {% abvd_evaluation dimension.Total %}
+                                                        </span>
+                                                     </span>
+                                                    {% elif instrument_name == "AIVD" %}
+                                                        <br>
+                                                        <span class="fw-bold">
+                                                         Grau de Dependência:
+                                                         <span class="text-{% if resolution.patient.sexo == 'Masculino' %}{% if dimension.Total <= 1 %}danger{% elif dimension.Total <= 3 %}warning{% else %}success{% endif %}{% elif resolution.patient.sexo == 'Feminino' %}{% if dimension.Total <= 3 %}danger{% elif dimension.Total <= 5 %}warning{% else %}success{% endif %}{% endif %}">
+                                                             {% aivd_evaluation dimension.Total resolution.patient.sexo %}
+                                                        </span>
+                                                     </span>
+                                                    {% endif %}
+                                                    <!-- Dimensões -->
+                                                    <ul class="list-group">
                                                         {% for dim, section in dimension.items %}
                                                             {% if forloop.counter0 == 0 %}
                                                                 <!-- Nada -->
                                                             {% elif dim != 'None' and dim != 'Graph' %}
-                                                                <a href="#" class="jq-btn no-decor"
-                                                                        {% for a in answers %}
-                                                                            {% if a.question.section.dimension.name == dim %}
-                                                                   data-href="{% url 'sections' resolution.part.protocol.id resolution.part.id a.question.section.dimension.instrument.area.id a.question.section.dimension.instrument.id a.question.section.dimension.id resolution.patient.id %}"
-                                                                            {% endif %}
-                                                                        {% endfor %}
-                                                                >
-                                                                    {{ dim }}
-                                                                    <svg style="margin-top: 0px;"
-                                                                         xmlns="http://www.w3.org/2000/svg"
-                                                                         width="16"
-                                                                         height="16" fill="currentColor"
-                                                                         class="bi bi-link" viewBox="0 0 16 16">
-                                                                        <path d="M6.354 5.5H4a3 3 0 0 0 0 6h3a3 3 0 0 0 2.83-4H9c-.086 0-.17.01-.25.031A2 2 0 0 1 7 10.5H4a2 2 0 1 1 0-4h1.535c.218-.376.495-.714.82-1z"/>
-                                                                        <path d="M9 5.5a3 3 0 0 0-2.83 4h1.098A2 2 0 0 1 9 6.5h3a2 2 0 1 1 0 4h-1.535a4.02 4.02 0 0 1-.82 1H12a3 3 0 1 0 0-6H9z"/>
-                                                                    </svg>
-                                                                </a> ({{ section.Total }})
-
-                                                                <br>
+                                                                <li>
+                                                                    <a href="#" class="jq-btn no-decor"
+                                                                            {% for a in answers %}
+                                                                                {% if a.question.section.dimension.name == dim %}
+                                                                       data-href="{% url 'sections' resolution.part.protocol.id resolution.part.id a.question.section.dimension.instrument.area.id a.question.section.dimension.instrument.id a.question.section.dimension.id resolution.patient.id %}"
+                                                                                {% endif %}
+                                                                            {% endfor %}> {{ dim }}
+                                                                        <svg style="margin-top: 0px;"
+                                                                             xmlns="http://www.w3.org/2000/svg"
+                                                                             width="16"
+                                                                             height="16" fill="currentColor"
+                                                                             class="bi bi-link" viewBox="0 0 16 16">
+                                                                            <path d="M6.354 5.5H4a3 3 0 0 0 0 6h3a3 3 0 0 0 2.83-4H9c-.086 0-.17.01-.25.031A2 2 0 0 1 7 10.5H4a2 2 0 1 1 0-4h1.535c.218-.376.495-.714.82-1z"/>
+                                                                            <path d="M9 5.5a3 3 0 0 0-2.83 4h1.098A2 2 0 0 1 9 6.5h3a2 2 0 1 1 0 4h-1.535a4.02 4.02 0 0 1-.82 1H12a3 3 0 1 0 0-6H9z"/>
+                                                                        </svg>
+                                                                    </a> (<span
+                                                                        class="fw-bold">Cotação:</span> {{ section.Total }})
+                                                                </li>
                                                             {% endif %}
                                                         {% endfor %}
-                                                    </td>
-
-                                                    <td style="width: 50%; vertical-align: middle;
-    text-align: center;
-    margin-left: auto;
-    margin-right: auto;
-    align: center;">
-                                                        {% if dimension.Graph %}
-                                                            {{ dimension.Graph|safe }}
-                                                        {% endif %}
-                                                    </td>
-                                                </tr>
-                                            {% empty %}
-                                                <tr>
-                                                    <td style="width: 50%;margin-bottom: 0px;">Sem Respostas
-                                                    </td>
-                                                </tr>
+                                                    </ul>
+                                                    <br>
+                                                {% endif %}
                                             {% endfor %}
-                                            </tbody>
-                                        </table>
+                                        </td>
+                                        {% if forloop.counter == 1 %}
+                                            <td style="vertical-align:middle;width: 5%;" rowspan="3"><p
+                                                    class="vertical sideways">Momento de Avaliação</p></td>
+                                        {% elif forloop.counter == 4 %}
+                                            {% count report.items as size_area %}
+                                            <td style="vertical-align:middle;width: 5%;"
+                                                rowspan="{% subtraction size_area 3 %}"><p
+                                                    class="vertical sideways text-center">Parte 5</p></td>
+                                        {% endif %}
+                                    </tr>
 
-                                    </div>
-
-                                </div>
-                            {% endfor %}
+                                {% endfor %}
+                                <tr></tr>
+                                </tbody>
+                            </table>
                         </div>
+
                     </div>
                 </div>
             </div>

@@ -416,6 +416,10 @@ class Answer(models.Model):
         else:
             return f"{self.question.name} >> Sem Resposta"
 
+    @property
+    def instrument(self):
+        return self.question.section.dimension.instrument.name
+
 class TextInputAnswer(models.Model):
     # class para inputs
     # fk para answer

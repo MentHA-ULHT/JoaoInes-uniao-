@@ -118,6 +118,15 @@
     vertical-align:middle;
 }
 
+.sideways{
+    text-orientation: sideways;
+    /*transform: rotate(180deg);*/
+}
+
+.vertical{
+    writing-mode: vertical-rl;
+}
+
 .breadcrumb {
     margin-bottom: 1rem;
 }
