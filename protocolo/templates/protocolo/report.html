@@ -35,18 +35,18 @@
                                                             {% endif %}
                                                         {% endfor %}
                                                 >{{ instrument_name }}</span>
-                                                    <svg style="margin-top: 0px;"
-                                                         xmlns="http://www.w3.org/2000/svg"
-                                                         width="16"
-                                                         height="16" fill="currentColor"
-                                                         class="bi bi-link" viewBox="0 0 16 16">
-                                                        <path d="M6.354 5.5H4a3 3 0 0 0 0 6h3a3 3 0 0 0 2.83-4H9c-.086 0-.17.01-.25.031A2 2 0 0 1 7 10.5H4a2 2 0 1 1 0-4h1.535c.218-.376.495-.714.82-1z"/>
-                                                        <path d="M9 5.5a3 3 0 0 0-2.83 4h1.098A2 2 0 0 1 9 6.5h3a2 2 0 1 1 0 4h-1.535a4.02 4.02 0 0 1-.82 1H12a3 3 0 1 0 0-6H9z"/>
-                                                    </svg>
+                                                <svg style="margin-top: 0px;"
+                                                     xmlns="http://www.w3.org/2000/svg"
+                                                     width="16"
+                                                     height="16" fill="currentColor"
+                                                     class="bi bi-link" viewBox="0 0 16 16">
+                                                    <path d="M6.354 5.5H4a3 3 0 0 0 0 6h3a3 3 0 0 0 2.83-4H9c-.086 0-.17.01-.25.031A2 2 0 0 1 7 10.5H4a2 2 0 1 1 0-4h1.535c.218-.376.495-.714.82-1z"/>
+                                                    <path d="M9 5.5a3 3 0 0 0-2.83 4h1.098A2 2 0 0 1 9 6.5h3a2 2 0 1 1 0 4h-1.535a4.02 4.02 0 0 1-.82 1H12a3 3 0 1 0 0-6H9z"/>
+                                                </svg>
                                                 </a>
                                                 {% if dimension.Total == 0 %}
-                                                    <ul class="list-group">
-                                                        <li><span class="text-warning fw-bold"> <i
+                                                    <ul class="list-group list-unstyled">
+                                                        <li><span class="badge bg-secondary"> <i
                                                                 class="fa fa-warning"></i> Não Respondido</span></li>
                                                     </ul>
                                                     <br>
@@ -73,7 +73,9 @@
                                                                                 <path d="M6.354 5.5H4a3 3 0 0 0 0 6h3a3 3 0 0 0 2.83-4H9c-.086 0-.17.01-.25.031A2 2 0 0 1 7 10.5H4a2 2 0 1 1 0-4h1.535c.218-.376.495-.714.82-1z"/>
                                                                                 <path d="M9 5.5a3 3 0 0 0-2.83 4h1.098A2 2 0 0 1 9 6.5h3a2 2 0 1 1 0 4h-1.535a4.02 4.02 0 0 1-.82 1H12a3 3 0 1 0 0-6H9z"/>
                                                                             </svg>
-                                                                        </a>: <span class="fw-bold">{{ a.multiple_choice_answer.name }}</span></li>
+                                                                        </a>: <span
+                                                                            class="fw-bold">{{ a.multiple_choice_answer.name }}</span>
+                                                                    </li>
                                                                 {% endif %}
                                                             {% endfor %}
                                                         </ul>
@@ -81,19 +83,41 @@
                                                     {% elif instrument_name == "ABVD - MDA" %}
                                                         <br>
                                                         <span class="fw-bold">
-                                                         Grau de Dependência:
-                                                         <span class="text-{% if dimension.Total <= 7 %}success{% elif dimension.Total <= 14 %}warning{% elif dimension.Total <= 24 %}danger{% endif %}">
-                                                            {% abvd_evaluation dimension.Total %}
+
+                                                         <span class="badge bg-{% if dimension.Total <= 7 %}success{% elif dimension.Total <= 14 %}warning{% else %}danger{% endif %}">
+                                                            Grau de Dependência {% abvd_evaluation dimension.Total %}
                                                         </span>
                                                      </span>
                                                     {% elif instrument_name == "AIVD" %}
                                                         <br>
-                                                        <span class="fw-bold">
-                                                         Grau de Dependência:
-                                                         <span class="text-{% if resolution.patient.sexo == 'Masculino' %}{% if dimension.Total <= 1 %}danger{% elif dimension.Total <= 3 %}warning{% else %}success{% endif %}{% elif resolution.patient.sexo == 'Feminino' %}{% if dimension.Total <= 3 %}danger{% elif dimension.Total <= 5 %}warning{% else %}success{% endif %}{% endif %}">
-                                                             {% aivd_evaluation dimension.Total resolution.patient.sexo %}
+                                                        <span class="badge bg-{% if resolution.patient.sexo == 'Masculino' %}{% if dimension.Total <= 1 %}danger{% elif dimension.Total <= 3 %}warning{% else %}success{% endif %}{% elif resolution.patient.sexo == 'Feminino' %}{% if dimension.Total <= 3 %}danger{% elif dimension.Total <= 5 %}warning{% else %}success{% endif %}{% endif %}">
+                                                             Grau de Dependência {% aivd_evaluation dimension.Total resolution.patient.sexo %}
                                                         </span>
-                                                     </span>
+                                                        <!-- BSI -->
+                                                    {% elif instrument_name == "BSI" %}
+                                                        <ul class="list-group">
+                                                            <li>Somatização: <span class="fw-bold">{% bsi_somatizacao_quotation answers %}</span></li>
+                                                            <li>Obsessões-Compulsões: <span class="fw-bold">{% bsi_obs_comp_quotation answers %}</span></li>
+                                                            <li>Depressão: <span class="fw-bold">{% bsi_depressao_quotation answers %}</span></li>
+                                                            <li>Sensibilidade Interpessoal: <span class="fw-bold">{% bsi_sens_interp_quotation answers %}</span></li>
+                                                            <li>Ansiedade: <span class="fw-bold">{% bsi_ansiedade_quotation answers %}</span></li>
+                                                            <li>Hostilidade: <span class="fw-bold">{% bsi_hostilidade_quotation answers %}</span></li>
+                                                            <li>Ansiedade Fóbica: <span class="fw-bold">{% bsi_ansiedade_fob_quotation answers %}</span></li>
+                                                            <li>Ideação Paranóide: <span class="fw-bold">{% bsi_ideacao_paranoide_quotation answers %}</span></li>
+                                                            <li>Psicoticismo: <span class="fw-bold">{% bsi_psicoticismo_quotation answers %}</span></li>
+                                                        </ul>
+                                                        <!-- HADS -->
+                                                    {% elif instrument_name == "HADS" %}
+                                                        {% hads_a_quotation answers as hads_a_q %}
+                                                        {% hads_d_quotation answers as hads_d_q %}
+                                                        <br>
+                                                        <span class="badge bg-{% if hads_a_q <= 10 %}success{% elif hads_a_q <= 14 %}warning{% else %}danger{% endif %}">
+                                                                Estado Ansiedade: {% hads_evaluation hads_a_q %} ({{ hads_a_q }})
+                                                            </span>
+                                                        <br>
+                                                        <span class="badge bg-{% if hads_d_q <= 10 %}success{% elif hads_d_q <= 14 %}warning{% else %}danger{% endif %}">
+                                                                Estado Depressão: {% hads_evaluation hads_d_q %} ({{ hads_d_q }})
+                                                            </span>
                                                     {% endif %}
                                                     <!-- Dimensões -->
                                                     <ul class="list-group">

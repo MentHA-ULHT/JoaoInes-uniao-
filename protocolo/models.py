@@ -210,8 +210,13 @@ class Question(Common):
             return True
         return False
 
+    @property
+    def instrument(self):
+        self.section.dimension.instrument.name
+
     def __str__(self):
         return f"{self.name}"
+
 
 
 class QuestionImage(models.Model):
@@ -233,7 +238,7 @@ class PossibleAnswer(Common):
                               blank=True, null=True)
 
     def __str__(self):
-        return f"{self.name}"
+        return f"{self.id}. {self.name} - {self.quotation}"
 
 
 class Resolution(models.Model):

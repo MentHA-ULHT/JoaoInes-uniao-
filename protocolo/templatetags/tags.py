@@ -54,3 +54,115 @@ def aivd_evaluation(val, sex):
             return "Ligeira"
         else:
             return "Independente"
+
+
+@register.simple_tag
+def hads_a_quotation(answers):
+    q = 0
+    for a in answers:
+        if a.instrument == 'HADS':
+            if a.question.order % 2 != 0:
+                q = q + a.quotation
+    return q
+
+
+@register.simple_tag
+def hads_d_quotation(answers):
+    q = 0
+    for a in answers:
+        if a.instrument == 'HADS':
+            if a.question.order % 2 == 0:
+                q = q + a.quotation
+    return q
+
+@register.simple_tag
+def hads_evaluation(quotation):
+    if quotation <= 7:
+        return "Normal"
+    elif quotation <= 10:
+        return "Ligeiro"
+    elif quotation <= 14:
+        return "Moderado"
+    else:
+        return "Severo"
+
+@register.simple_tag
+def bsi_somatizacao_quotation(answers):
+    q = 0
+    for a in answers:
+        if a.instrument == 'BSI':
+            if a.question.order in [2,7,23,29,30,33,37]:
+                q = q + a.multiple_choice_answer.quotation
+    return q
+
+@register.simple_tag
+def bsi_obs_comp_quotation(answers):
+    q = 0
+    for a in answers:
+        if a.instrument == 'BSI':
+            if a.question.order in [5,15,26,27,32,36]:
+                q = q + a.multiple_choice_answer.quotation
+    return q
+
+@register.simple_tag
+def bsi_sens_interp_quotation(answers):
+    q = 0
+    for a in answers:
+        if a.instrument == 'BSI':
+            if a.question.order in [20,21,22,42]:
+                q = q + a.multiple_choice_answer.quotation
+    return q
+
+@register.simple_tag
+def bsi_depressao_quotation(answers):
+    q = 0
+    for a in answers:
+        if a.instrument == 'BSI':
+            if a.question.order in [9,16,17,18,35,50]:
+                q = q + a.multiple_choice_answer.quotation
+    return q
+
+@register.simple_tag
+def bsi_ansiedade_quotation(answers):
+    q = 0
+    for a in answers:
+        if a.instrument == 'BSI':
+            if a.question.order in [1,12,19,38,45,49]:
+                q = q + a.multiple_choice_answer.quotation
+    return q
+
+@register.simple_tag
+def bsi_hostilidade_quotation(answers):
+    q = 0
+    for a in answers:
+        if a.instrument == 'BSI':
+            if a.question.order in [6,13,40,41,46]:
+                q = q + a.multiple_choice_answer.quotation
+    return q
+
+@register.simple_tag
+def bsi_ansiedade_fob_quotation(answers):
+    q = 0
+    for a in answers:
+        if a.instrument == 'BSI':
+            if a.question.order in [8,28,31,43,47]:
+                q = q + a.multiple_choice_answer.quotation
+    return q
+
+@register.simple_tag
+def bsi_ideacao_paranoide_quotation(answers):
+    q = 0
+    for a in answers:
+        if a.instrument == 'BSI':
+            if a.question.order in [4,10,24,48,51]:
+                q = q + a.multiple_choice_answer.quotation
+    return q
+
+@register.simple_tag
+def bsi_psicoticismo_quotation(answers):
+    q = 0
+    for a in answers:
+        if a.instrument == 'BSI':
+            if a.question.order in [3,14,34,44,53]:
+                q = q + a.multiple_choice_answer.quotation
+    return q
