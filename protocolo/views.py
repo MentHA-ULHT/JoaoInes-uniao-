@@ -19,34 +19,17 @@ import pandas as pd
 def dashboard_view(request):
     return render(request, 'protocolo/dashboard.html')
 
+
 @login_required(login_url='login')
 def dashboard_content_view(request):
     return render(request, 'protocolo/dashboardcontent.html')
 
+
 @login_required(login_url='login')
 def protocolos_view(request):
-    inst = Instrument.objects.filter(name="HADS").get()
-    qs = []
-    for d in Dimension.objects.all():
-        if d.instrument == inst:
-            for s in Section.objects.all():
-                if s.dimension == d:
-                    for q in Question.objects.all():
-                        if q.section == s:
-                            qs.append(q)
-
-    #q = Question.objects.filter(section=sect)#.update(pdf_page=33)
-    print(f"Found {len(qs)} questions")
-    print(qs)
-    for q in qs:
-        q.pdf_page = 39
-        q.quotation_max=5
-        q.save()
-
-
-
     context = {'protocolos': Protocol.objects.all().order_by('order')}
     return render(request, 'protocolo/protocolos.html', context)
+
 
 @login_required(login_url='login')
 def parts_view(request, protocol_id, patient_id):
@@ -78,6 +61,7 @@ def parts_view(request, protocol_id, patient_id):
         'patient': patient,
     }
     return render(request, 'protocolo/parts.html', context)
+
 
 @login_required(login_url='login')
 def areas_view(request, protocol_id, part_id, patient_id):
@@ -116,6 +100,7 @@ def areas_view(request, protocol_id, part_id, patient_id):
     }
     return render(request, 'protocolo/areas.html', context)
 
+
 @login_required(login_url='login')
 def instruments_view(request, protocol_id, part_id, area_id, patient_id):
     protocol = Protocol.objects.get(pk=protocol_id)
@@ -151,6 +136,7 @@ def instruments_view(request, protocol_id, part_id, area_id, patient_id):
 
     return render(request, 'protocolo/instruments.html', context)
 
+
 @login_required(login_url='login')
 def dimensions_view(request, protocol_id, part_id, area_id, instrument_id, patient_id):
     protocol = Protocol.objects.get(pk=protocol_id)
@@ -165,8 +151,8 @@ def dimensions_view(request, protocol_id, part_id, area_id, instrument_id, patie
 
     # statistics
     r = Resolution.objects.get(patient=patient, doctor=request.user, part=part)
-    #print_nested_dict(r.statistics.get(str(area.id)).get(str(instrument.id)))
-    #print(r.statistics.get(str(area.id)).get(str(instrument.id)).get('9').get('quotation'))
+    # print_nested_dict(r.statistics.get(str(area.id)).get(str(instrument.id)))
+    # print(r.statistics.get(str(area.id)).get(str(instrument.id)).get('9').get('quotation'))
 
     answered_list = []
     percentage_list = []
@@ -190,6 +176,7 @@ def dimensions_view(request, protocol_id, part_id, area_id, instrument_id, patie
         'patient': patient,
     }
     return render(request, 'protocolo/dimensions.html', context)
+
 
 @login_required(login_url='login')
 def sections_view(request, protocol_id, part_id, area_id, instrument_id, dimension_id, patient_id):
@@ -244,6 +231,7 @@ def sections_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
 
     return render(request, 'protocolo/sections.html', context)
 
+
 @login_required(login_url='login')
 def question_view(request, protocol_id, part_id, area_id, instrument_id, dimension_id, section_id, patient_id):
     protocol = Protocol.objects.get(pk=protocol_id)
@@ -257,8 +245,8 @@ def question_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
     patient = Participante.objects.get(pk=patient_id)
     r = Resolution.objects.get(patient=patient, doctor=request.user, part=part)
     answers = Answer.objects.filter(resolution=r)
-    #print(question.section.number_of_questions)
-    #print(question.section.dimension.number_of_questions)
+    # print(question.section.number_of_questions)
+    # print(question.section.dimension.number_of_questions)
     context = {
         'area': area,
         'part': part,
@@ -272,7 +260,7 @@ def question_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
         'answers': answers,
         'patient': patient,
     }
-    #print(answers)
+    # print(answers)
 
     if question.question_type == 3:
         question_list = []
@@ -456,7 +444,7 @@ def question_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
                                    f'{section_id}', q)
 
         elif question.question_type == 5:
-            #print(request.POST)
+            # print(request.POST)
             existing = False
             if len(Answer.objects.filter(question=question, resolution=r)) >= 1:
                 a = Answer.objects.filter(question=question, resolution=r).get()
@@ -470,14 +458,16 @@ def question_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
             counter = 0
             for i in range(1, 5):
                 text_area = request.POST.get(str(i))
-                counter += len(text_area.split(","))
-                #print(text_area)
-                ti = TextInputAnswer()
-                ti.answer = a
-                ti.seconds = i
-                ti.text = text_area
-                ti.save()
-            q = calculate_timer_quotation(counter)
+                if len(text_area) > 1:
+                    counter += len(text_area.split(","))
+                    print(text_area)
+                    print(counter)
+                    ti = TextInputAnswer()
+                    ti.answer = a
+                    ti.seconds = i
+                    ti.text = text_area
+                    ti.save()
+            q = calculate_timer_quotation(question, counter)
             a.quotation = q
             a.save()
 
@@ -489,72 +479,38 @@ def question_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
                                        f'{section_id}')
                 r.change_quotation(f'{area_id}', f'{instrument_id}', f'{dimension_id}',
                                    f'{section_id}', q)
-        print(question.section.dimension.number_of_questions)
+        #print(question.section.dimension.number_of_questions)
         if question.question_type == 3:
             return redirect('instruments',
                             protocol_id=protocol_id, part_id=part_id,
                             area_id=area_id, patient_id=patient_id)
         elif question.section.dimension.number_of_questions > 1:
             return redirect('sections',
-                        protocol_id=protocol_id, part_id=part_id,
-                        area_id=area_id, instrument_id=instrument_id, dimension_id=dimension_id,
-                        patient_id=patient_id)
+                            protocol_id=protocol_id, part_id=part_id,
+                            area_id=area_id, instrument_id=instrument_id, dimension_id=dimension_id,
+                            patient_id=patient_id)
         elif question.section.dimension.number_of_questions < 1:
             return redirect('dimensions',
                             protocol_id=protocol_id, part_id=part_id,
                             area_id=area_id, instrument_id=instrument_id, patient_id=patient_id)
 
-
     return render(request, 'protocolo/question.html', context)
 
-@login_required(login_url='login')
-def calculate_timer_quotation(question, i):
-    if not "Animais" in question.name:
-        if i < 2:
-            return 0
-        elif i <= 3:
-            return 1
-        elif i <= 5:
-            return 2
-        elif i <= 7:
-            return 3
-        elif i <= 10:
-            return 4
-        elif i <= 13:
-            return 5
-        elif i <= 17:
-            return 6
-        elif i > 17:
-            return 7
-    else:
-        if i < 5:
-            return 0
-        elif i <= 6:
-            return 1
-        elif i <= 8:
-            return 2
-        elif i <= 10:
-            return 3
-        elif i <= 13:
-            return 4
-        elif i <= 16:
-            return 5
-        elif i <= 21:
-            return 6
-        elif i > 21:
-            return 7
+
+
 
 
 @login_required(login_url='login')
 def report_view(request, resolution_id):
     r = Resolution.objects.get(pk=resolution_id)
-    #print(r)
+    # print(r)
     # É necessário o ensure_ascii = False para mostrar caracteres UTF-8
     report_json = r.statistics
     report_json_dumps = json.dumps(report_json, indent=1, sort_keys=False, ensure_ascii=False)
     report = {}
     answers = Answer.objects.filter(resolution=r).order_by("question__section__order")
-    #print(answers)
+    # print(answers)
+    done = []
 
     for area in Area.objects.filter(part=r.part):
         report[area.name] = {}
@@ -584,35 +540,30 @@ def report_view(request, resolution_id):
                         answer = Answer.objects.filter(question=question, resolution=r)
                         if answer.exists():
                             report[area.name][instrument.name]["Total"] += answer.get().quotation
-                            if report[area.name][instrument.name][dimension.name]["Total"] + answer.get().quotation <= question.quotation_max:
+                            if report[area.name][instrument.name][dimension.name][
+                                "Total"] + answer.get().quotation <= question.quotation_max:
                                 report[area.name][instrument.name][dimension.name]["Total"] += answer.get().quotation
                             if dimension.name == 'None' and section.name != 'None':
                                 quotations.append(answer.get().quotation)
                 if dimension.name != 'None':
                     quotations.append(report[area.name][instrument.name][dimension.name]["Total"])
-            #print(dimension)
-            #print(quotations)
-            #print(names)
+
             if len(quotations) == len(names) and dimension.name != 'None' or len(quotations) == len(
-                    names) and section.name != 'None':
-                fig = go.Figure(data=go.Scatterpolar(
-                    r=quotations,
-                    theta=names,
-                    fill='toself'
-                ))
-                fig.update_traces(fill='toself')
-                fig.update_layout(
-                    polar=dict(
-                        radialaxis=dict(
-                            visible=True
-                        ),
-                    ),
-                    showlegend=False
-                )
-                fig.update_yaxes(automargin=True)
-                # fig.show()
-                report[area.name][instrument.name]["Graph"] = plotly.offline.plot(fig, auto_open=False,
-                                                                                  output_type="div")
+                    names) and section.name != 'None' and len(quotations) != 0:
+                for answer in answers:
+                    if answer.instrument == instrument.name and instrument.name not in done:
+                        report[area.name][instrument.name]["Graph"] = make_graph(names,quotations, instrument.minimum_quotation, instrument.maximum_quotation)
+                        done.append(instrument.name)
+
+        for instrument in instruments:
+            if instrument.name == "BSI":
+                for answer in answers:
+                    if answer.instrument == instrument.name:
+                        names = ['Somatização', 'Obsessões-Compulsões', 'Depressão', 'Sensibilidade Interpessoal', 'Ansiedade',
+                                 'Hostilidade', 'Ansiedade Fóbica', 'Ideação Paranóide', 'Psicotismo']
+                        quotations = bsi_quotation(answers)
+                        report[area.name]["BSI"]["Graph"] = make_graph(names, quotations, 0, 28)
+                        done.append(instrument.name)
 
     # print(json.dumps(report_json, indent=1, sort_keys=False, ensure_ascii=False))
     # Funcionalidade
@@ -622,10 +573,11 @@ def report_view(request, resolution_id):
                'resolution': r,
                'answers': answers,
                'instruments': Instrument.objects.all(),
-               }
-
+               'questions': Question.objects.all(),}
+    print(Question.objects.all())
 
     return render(request, 'protocolo/report.html', context)
+
 
 @login_required(login_url='login')
 def protocol_participants_view(request, protocol_id):
@@ -665,6 +617,8 @@ def login_view(request):
 
 
 from django.contrib.auth import logout
+
+
 def logout_view(request):
     logout(request)
 
@@ -681,7 +635,7 @@ def profile_view(request, participant_id):
 
     cuidadores = ", ".join(c)
 
-    #print(cuidadores)
+    # print(cuidadores)
     context = {
         'p': p,
         'cuidadores': cuidadores,

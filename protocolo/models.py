@@ -123,9 +123,27 @@ class Instrument(Common):
 
         for q in questions:
             if q.section in sections:
-                max_q = max_q + q.quotation_max
+                if max_q < q.quotation_max:
+                    max_q = q.quotation_max
 
         return max_q
+
+    @property
+    def minimum_quotation(self):
+        questions = Question.objects.all()
+        min_q = 0
+        dimensions = Dimension.objects.filter(instrument=self)
+        sections = []
+        for sec in Section.objects.all():
+            if sec.dimension in dimensions:
+                sections.append(sec)
+
+        for q in questions:
+            if q.section in sections:
+                if min_q > q.quotation_max:
+                    min_q = q.quotation_max
+
+        return min_q
 
 class Dimension(Common):
     instrument = models.ForeignKey('Instrument', on_delete=models.CASCADE)
@@ -248,7 +266,6 @@ class Resolution(models.Model):
     date = models.DateTimeField(default=timezone.now)
     doctor = models.ForeignKey(settings.AUTH_USER_MODEL,
                                 on_delete=models.CASCADE, default=None, blank=True, null=True)
-
     statistics = models.JSONField(blank=True, default=dict)
 
     def __str__(self):

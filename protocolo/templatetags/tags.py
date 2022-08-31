@@ -166,3 +166,16 @@ def bsi_psicoticismo_quotation(answers):
             if a.question.order in [3,14,34,44,53]:
                 q = q + a.multiple_choice_answer.quotation
     return q
+
+@register.simple_tag
+def gds_evaluation(answers):
+    for a in answers:
+        if a.instrument == 'GDS':
+            if 'Estadio' in a.question.name:
+                return f"Nível {a.quotation}: {a.multiple_choice_answer.name}"
+
+@register.simple_tag
+def exist_answers(instrument , answers):
+    for a in answers:
+        if a.instrument == instrument:
+            return True

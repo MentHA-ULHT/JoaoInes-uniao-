@@ -14,8 +14,9 @@
                                 <tr>
                                     <th style="width: 20%;text-align: left;color: var(--bs-blue);">Área de Avaliação
                                     </th>
-                                    <th style="text-align: left;color: var(--bs-blue);">Resultados</th>
-                                    <th style="text-align: left;color: var(--bs-blue);"></th>
+                                    <th style="width: 35%;text-align: left;color: var(--bs-blue);">Resultados</th>
+                                    <th style="width: 40%;text-align: left;color: var(--bs-blue);">{% comment %} GRAFICOS {% endcomment %}</th>
+                                    <th style="width: 5%;text-align: left;color: var(--bs-blue);"></th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -44,7 +45,8 @@
                                                     <path d="M9 5.5a3 3 0 0 0-2.83 4h1.098A2 2 0 0 1 9 6.5h3a2 2 0 1 1 0 4h-1.535a4.02 4.02 0 0 1-.82 1H12a3 3 0 1 0 0-6H9z"/>
                                                 </svg>
                                                 </a>
-                                                {% if dimension.Total == 0 %}
+                                                {% exist_answers instrument_name answers as exists %}
+                                                {% if not exists %}
                                                     <ul class="list-group list-unstyled">
                                                         <li><span class="badge bg-secondary"> <i
                                                                 class="fa fa-warning"></i> Não Respondido</span></li>
@@ -53,7 +55,7 @@
                                                 {% else %}
 
                                                     {% comment %}
-                                                (Cotação Total: {{ dimension.Total }})
+                                                    (Cotação Total: {{ dimension.Total }})
                                                 {% endcomment %}
                                                     <!-- CASOS ESPECIAIS -->
                                                     <!-- PANAS -->
@@ -88,23 +90,43 @@
                                                             Grau de Dependência {% abvd_evaluation dimension.Total %}
                                                         </span>
                                                      </span>
+                                                        <!-- AIVD -->
                                                     {% elif instrument_name == "AIVD" %}
                                                         <br>
-                                                        <span class="badge bg-{% if resolution.patient.sexo == 'Masculino' %}{% if dimension.Total <= 1 %}danger{% elif dimension.Total <= 3 %}warning{% else %}success{% endif %}{% elif resolution.patient.sexo == 'Feminino' %}{% if dimension.Total <= 3 %}danger{% elif dimension.Total <= 5 %}warning{% else %}success{% endif %}{% endif %}">
+                                                        <span class="badge bg-
+                                                                {% if resolution.patient.sexo == 'Masculino' %}{% if dimension.Total <= 1 %}danger{% elif dimension.Total <= 3 %}warning{% else %}success{% endif %}{% elif resolution.patient.sexo == 'Feminino' %}{% if dimension.Total <= 3 %}danger{% elif dimension.Total <= 5 %}warning{% else %}success{% endif %}{% endif %}">
                                                              Grau de Dependência {% aivd_evaluation dimension.Total resolution.patient.sexo %}
                                                         </span>
                                                         <!-- BSI -->
                                                     {% elif instrument_name == "BSI" %}
                                                         <ul class="list-group">
-                                                            <li>Somatização: <span class="fw-bold">{% bsi_somatizacao_quotation answers %}</span></li>
-                                                            <li>Obsessões-Compulsões: <span class="fw-bold">{% bsi_obs_comp_quotation answers %}</span></li>
-                                                            <li>Depressão: <span class="fw-bold">{% bsi_depressao_quotation answers %}</span></li>
-                                                            <li>Sensibilidade Interpessoal: <span class="fw-bold">{% bsi_sens_interp_quotation answers %}</span></li>
-                                                            <li>Ansiedade: <span class="fw-bold">{% bsi_ansiedade_quotation answers %}</span></li>
-                                                            <li>Hostilidade: <span class="fw-bold">{% bsi_hostilidade_quotation answers %}</span></li>
-                                                            <li>Ansiedade Fóbica: <span class="fw-bold">{% bsi_ansiedade_fob_quotation answers %}</span></li>
-                                                            <li>Ideação Paranóide: <span class="fw-bold">{% bsi_ideacao_paranoide_quotation answers %}</span></li>
-                                                            <li>Psicoticismo: <span class="fw-bold">{% bsi_psicoticismo_quotation answers %}</span></li>
+                                                            <li>Somatização: <span
+                                                                    class="fw-bold">{% bsi_somatizacao_quotation answers %}</span>
+                                                            </li>
+                                                            <li>Obsessões-Compulsões: <span
+                                                                    class="fw-bold">{% bsi_obs_comp_quotation answers %}</span>
+                                                            </li>
+                                                            <li>Depressão: <span
+                                                                    class="fw-bold">{% bsi_depressao_quotation answers %}</span>
+                                                            </li>
+                                                            <li>Sensibilidade Interpessoal: <span
+                                                                    class="fw-bold">{% bsi_sens_interp_quotation answers %}</span>
+                                                            </li>
+                                                            <li>Ansiedade: <span
+                                                                    class="fw-bold">{% bsi_ansiedade_quotation answers %}</span>
+                                                            </li>
+                                                            <li>Hostilidade: <span
+                                                                    class="fw-bold">{% bsi_hostilidade_quotation answers %}</span>
+                                                            </li>
+                                                            <li>Ansiedade Fóbica: <span
+                                                                    class="fw-bold">{% bsi_ansiedade_fob_quotation answers %}</span>
+                                                            </li>
+                                                            <li>Ideação Paranóide: <span
+                                                                    class="fw-bold">{% bsi_ideacao_paranoide_quotation answers %}</span>
+                                                            </li>
+                                                            <li>Psicoticismo: <span
+                                                                    class="fw-bold">{% bsi_psicoticismo_quotation answers %}</span>
+                                                            </li>
                                                         </ul>
                                                         <!-- HADS -->
                                                     {% elif instrument_name == "HADS" %}
@@ -118,18 +140,22 @@
                                                         <span class="badge bg-{% if hads_d_q <= 10 %}success{% elif hads_d_q <= 14 %}warning{% else %}danger{% endif %}">
                                                                 Estado Depressão: {% hads_evaluation hads_d_q %} ({{ hads_d_q }})
                                                             </span>
+                                                        <!-- GDS -->
+                                                    {% elif instrument_name == "GDS" %}
+                                                        <br>
+                                                        <span class="badge bg-primary">{% gds_evaluation answers %}</span>
                                                     {% endif %}
                                                     <!-- Dimensões -->
                                                     <ul class="list-group">
                                                         {% for dim, section in dimension.items %}
                                                             {% if forloop.counter0 == 0 %}
                                                                 <!-- Nada -->
-                                                            {% elif dim != 'None' and dim != 'Graph' %}
+                                                            {% elif dim != 'None' and dim != 'Graph' and instrument_name != "GDS" %}
                                                                 <li>
                                                                     <a href="#" class="jq-btn no-decor"
-                                                                            {% for a in answers %}
-                                                                                {% if a.question.section.dimension.name == dim %}
-                                                                       data-href="{% url 'sections' resolution.part.protocol.id resolution.part.id a.question.section.dimension.instrument.area.id a.question.section.dimension.instrument.id a.question.section.dimension.id resolution.patient.id %}"
+                                                                            {% for q in questions %}
+                                                                                {% if q.section.dimension.name == dim %}
+                                                                                    data-href="{% url 'sections' resolution.part.protocol.id resolution.part.id q.section.dimension.instrument.area.id q.section.dimension.instrument.id q.section.dimension.id resolution.patient.id %}"
                                                                                 {% endif %}
                                                                             {% endfor %}> {{ dim }}
                                                                         <svg style="margin-top: 0px;"
@@ -148,6 +174,15 @@
                                                     </ul>
                                                     <br>
                                                 {% endif %}
+                                            {% endfor %}
+                                        </td>
+                                        <td style="justify-content: center">
+                                            {% for instrument_name, dimension in instrument.items %}
+
+                                                {% if dimension.Graph and instrument_name != "GDS" %}
+                                                    {{ dimension.Graph|safe }}
+                                                {% endif %}
+
                                             {% endfor %}
                                         </td>
                                         {% if forloop.counter == 1 %}

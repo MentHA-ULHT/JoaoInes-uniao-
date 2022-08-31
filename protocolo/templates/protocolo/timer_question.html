@@ -19,13 +19,13 @@
             <tbody>
             <tr>
                 <td><textarea class="notes-area form-control" id="1"
-                  name="1" style="width: 100%;">{% for a in answers %}{% if a.TIAnswer.all|length > 0 %}{% for ti in a.TIAnswer.all %}{% if ti.seconds == 1 %}{{ ti.text }}{% endif %}{% endfor %}{% endif %}{% endfor %}</textarea></td>
+                  name="1" style="width: 100%;">{% for a in answers %}{% if a.TIAnswer.all|length > 0 %}{% for ti in a.TIAnswer.all %}{% if ti.seconds == 1 and a.question == question %}{{ ti.text }}{% endif %}{% endfor %}{% endif %}{% endfor %}</textarea></td>
                 <td><textarea class="notes-area form-control" id="2"
-                  name="2" style="width: 100%;">{% for a in answers %}{% if a.TIAnswer.all|length > 0 %}{% for ti in a.TIAnswer.all %}{% if ti.seconds == 2 %}{{ ti.text }}{% endif %}{% endfor %}{% endif %}{% endfor %}</textarea></td>
+                  name="2" style="width: 100%;">{% for a in answers %}{% if a.TIAnswer.all|length > 0 %}{% for ti in a.TIAnswer.all %}{% if ti.seconds == 2 and a.question == question %}{{ ti.text }}{% endif %}{% endfor %}{% endif %}{% endfor %}</textarea></td>
                 <td><textarea class="notes-area form-control" id="3"
-                  name="3" style="width: 100%;">{% for a in answers %}{% if a.TIAnswer.all|length > 0 %}{% for ti in a.TIAnswer.all %}{% if ti.seconds == 3 %}{{ ti.text }}{% endif %}{% endfor %}{% endif %}{% endfor %}</textarea></td>
+                  name="3" style="width: 100%;">{% for a in answers %}{% if a.TIAnswer.all|length > 0 %}{% for ti in a.TIAnswer.all %}{% if ti.seconds == 3 and a.question == question %}{{ ti.text }}{% endif %}{% endfor %}{% endif %}{% endfor %}</textarea></td>
                 <td><textarea class="notes-area form-control" id="4"
-                  name="4" style="width: 100%;">{% for a in answers %}{% if a.TIAnswer.all|length > 0 %}{% for ti in a.TIAnswer.all %}{% if ti.seconds == 4 %}{{ ti.text }}{% endif %}{% endfor %}{% endif %}{% endfor %}</textarea></td>
+                  name="4" style="width: 100%;">{% for a in answers %}{% if a.TIAnswer.all|length > 0 %}{% for ti in a.TIAnswer.all %}{% if ti.seconds == 4 and a.question == question %}{{ ti.text }}{% endif %}{% endfor %}{% endif %}{% endfor %}</textarea></td>
             </tr>
             <tr></tr>
             </tbody>
@@ -42,7 +42,7 @@
 
     <div class="flex-buttons">
         <button class="btn jq-btn btn-primary flex-left"
-                {% if question.section.number_of_questions > 1 %}
+                {% if question.section.dimension.number_of_questions > 1 %}
                 data-href="{% url 'sections' protocol.id part.id area.id instrument.id dimension.id patient.id %}"
                 {% else %}
                 data-href="{% url 'dimensions' protocol.id part.id area.id instrument.id patient.id %}"
