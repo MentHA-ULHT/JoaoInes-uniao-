@@ -128,9 +128,12 @@ def make_graph(names, quotations, min, max):
     ))
     fig.update_traces(fill='toself')
     fig.update_layout(
-        width=450,
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
+        width=425,
         height=200,
         margin=dict(l=70, r=70, t=20, b=20),
+        dragmode=False,
         polar=dict(
             radialaxis=dict(
                 tickmode='linear',
@@ -143,8 +146,9 @@ def make_graph(names, quotations, min, max):
         ),
         showlegend=False
     )
-    fig.update_yaxes(automargin=True)
-    return plotly.offline.plot(fig, auto_open=False,output_type="div")
+    fig.update_xaxes(fixedrange=True)
+    fig.update_yaxes(automargin=True, fixedrange=True)
+    return plotly.offline.plot(fig, auto_open=False, output_type="div")
 
 def calculate_timer_quotation(question, i):
     if not "Animais" in question.name:

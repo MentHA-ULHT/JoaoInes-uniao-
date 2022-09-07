@@ -152,6 +152,13 @@ class Avaliador(Utilizador):
 
 
 class Participante(Utilizador):
+    opEscolaridade = (
+        ("0-4", "0-4"),
+        ("5-9", "5-9"),
+        ("10-12", "10-12"),
+        ("12+", "12+")
+    )
+    escolaridade = models.CharField(max_length=20, choices=opEscolaridade, default="0-9", blank=False, null=False)
     diagnosticos = models.ManyToManyField(Doenca, related_name='participantes')
     referenciacao = models.ForeignKey(Reference, on_delete= models.CASCADE)
     grupoCog = models.ForeignKey(GrupoCog, on_delete=models.CASCADE, null=True, blank=True, related_name='participantes')

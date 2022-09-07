@@ -6,7 +6,7 @@
             <thead>
             <tr>
                 <th style="width: 5%;"></th>
-                <th>Estadios GDS</th>
+                <th>Estadios GDS {{ existing_answer_id }}</th>
             </tr>
             </thead>
             <tbody>
@@ -14,7 +14,7 @@
             <tr>
                 <td style="text-align: center">{{ answer.order }}</td>
                 <td><input class="" id="{{ answer.id }}" name="choice" type="radio" value="{{ answer.id }}"
-                                {% if answer.id in existing_answer_id %}
+                                {% if answer.id == existing_answer_id.0 %}
                                checked="checked"
                                 {% endif %}
                         /> {{ answer.name }} </td>

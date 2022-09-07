@@ -489,10 +489,11 @@ def question_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
                             protocol_id=protocol_id, part_id=part_id,
                             area_id=area_id, instrument_id=instrument_id, dimension_id=dimension_id,
                             patient_id=patient_id)
-        elif question.section.dimension.number_of_questions < 1:
+        elif question.section.dimension.number_of_questions < 1 or question.question_type == 9:
             return redirect('dimensions',
                             protocol_id=protocol_id, part_id=part_id,
                             area_id=area_id, instrument_id=instrument_id, patient_id=patient_id)
+
 
     return render(request, 'protocolo/question.html', context)
 
@@ -626,7 +627,9 @@ def logout_view(request):
 
 
 def profile_view(request, participant_id):
+    #Falta mostrar as resoluções das partes feitas no perfil e os seus relatorios
     p = Participante.objects.filter(pk=participant_id).get()
+    resolutions = Resolution.objects.filter(patient=p)
     c = []
 
     for cuidador in Cuidador.objects.all():
@@ -639,6 +642,6 @@ def profile_view(request, participant_id):
     context = {
         'p': p,
         'cuidadores': cuidadores,
+        'resolutions': resolutions,
     }
-
     return render(request, 'protocolo/profile.html', context)

@@ -85,7 +85,6 @@
                                                     {% elif instrument_name == "ABVD - MDA" %}
                                                         <br>
                                                         <span class="fw-bold">
-
                                                          <span class="badge bg-{% if dimension.Total <= 7 %}success{% elif dimension.Total <= 14 %}warning{% else %}danger{% endif %}">
                                                             Grau de Dependência {% abvd_evaluation dimension.Total %}
                                                         </span>
@@ -93,8 +92,7 @@
                                                         <!-- AIVD -->
                                                     {% elif instrument_name == "AIVD" %}
                                                         <br>
-                                                        <span class="badge bg-
-                                                                {% if resolution.patient.sexo == 'Masculino' %}{% if dimension.Total <= 1 %}danger{% elif dimension.Total <= 3 %}warning{% else %}success{% endif %}{% elif resolution.patient.sexo == 'Feminino' %}{% if dimension.Total <= 3 %}danger{% elif dimension.Total <= 5 %}warning{% else %}success{% endif %}{% endif %}">
+                                                        <span class="badge bg-{% if resolution.patient.sexo == 'Masculino' %}{% if dimension.Total <= 1 %}danger{% elif dimension.Total <= 3 %}warning{% else %}success{% endif %}{% elif resolution.patient.sexo == 'Feminino' %}{% if dimension.Total <= 3 %}danger{% elif dimension.Total <= 5 %}warning{% else %}success{% endif %}{% endif %}">
                                                              Grau de Dependência {% aivd_evaluation dimension.Total resolution.patient.sexo %}
                                                         </span>
                                                         <!-- BSI -->
@@ -144,6 +142,28 @@
                                                     {% elif instrument_name == "GDS" %}
                                                         <br>
                                                         <span class="badge bg-primary">{% gds_evaluation answers %}</span>
+
+                                                    <!-- MMSE -->
+                                                    {% elif instrument_name == "MMSE" %}
+                                                        <br>
+                                                    {% mmse_evaluation resolution.patient dimension.Total as mmse_eval_bool %}
+                                                        {% if mmse_eval_bool %}
+                                                             <span class="badge bg-danger"> Com Declíneo Cognitivo</span>
+                                                        {% else %}
+                                                            <span class="badge bg-success"> Sem Declíneo Cognitivo</span>
+                                                        {% endif %}
+                                                        {% elif instrument_name == "MMSE" %}
+                                                        <br>
+                                                    <!-- ACER-R -->
+                                                    {% elif instrument_name == "ACER-R" %}
+                                                        <br>
+                                                        {% if dimension.Total > 79 %}
+                                                            <span class="badge bg-success"> Sem Declíneo Cognitivo</span>
+                                                        {% elif dimension.Total <= 68 %}
+                                                            <span class="badge bg-danger"> Demência</span>
+                                                        {% elif dimension.Total <= 79 %}
+                                                            <span class="badge bg-danger"> Declíneo Cognitivo Ligeiro</span>
+                                                        {% endif %}
                                                     {% endif %}
                                                     <!-- Dimensões -->
                                                     <ul class="list-group">

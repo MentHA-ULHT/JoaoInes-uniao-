@@ -175,7 +175,18 @@ def gds_evaluation(answers):
                 return f"Nível {a.quotation}: {a.multiple_choice_answer.name}"
 
 @register.simple_tag
-def exist_answers(instrument , answers):
+def exist_answers(instrument, answers):
     for a in answers:
         if a.instrument == instrument:
             return True
+
+@register.simple_tag
+def mmse_evaluation(patient, quotation):
+    #True = Com declinio
+    #False = Sem declinio
+    if patient.escolaridade == '0':
+        return quotation <= 15
+    elif patient.escolaridade in ['0-4','5-9','10-12']:
+        return quotation <= 22
+    else:
+        return quotation <=27
