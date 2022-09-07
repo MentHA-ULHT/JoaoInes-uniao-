@@ -174,7 +174,7 @@
                                                                 <li>
                                                                     <a href="#" class="jq-btn no-decor"
                                                                             {% for q in questions %}
-                                                                                {% if q.section.dimension.name == dim %}
+                                                                                {% if q.section.dimension.name == dim and instrument_name == q.section.dimension.instrument.name %}
                                                                                     data-href="{% url 'sections' resolution.part.protocol.id resolution.part.id q.section.dimension.instrument.area.id q.section.dimension.instrument.id q.section.dimension.id resolution.patient.id %}"
                                                                                 {% endif %}
                                                                             {% endfor %}> {{ dim }}

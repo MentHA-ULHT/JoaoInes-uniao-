@@ -484,15 +484,19 @@ def question_view(request, protocol_id, part_id, area_id, instrument_id, dimensi
             return redirect('instruments',
                             protocol_id=protocol_id, part_id=part_id,
                             area_id=area_id, patient_id=patient_id)
-        elif question.section.dimension.number_of_questions > 1:
-            return redirect('sections',
+        elif question.section.dimension.name == "None":
+            return redirect('instruments',
                             protocol_id=protocol_id, part_id=part_id,
-                            area_id=area_id, instrument_id=instrument_id, dimension_id=dimension_id,
-                            patient_id=patient_id)
-        elif question.section.dimension.number_of_questions < 1 or question.question_type == 9:
+                            area_id=area_id, patient_id=patient_id)
+        elif question.section.name == "None" or question.question_type == 9 or question.section.dimension.number_of_questions == 1:
             return redirect('dimensions',
                             protocol_id=protocol_id, part_id=part_id,
                             area_id=area_id, instrument_id=instrument_id, patient_id=patient_id)
+        else:
+            return redirect('sections',
+                            protocol_id=protocol_id, part_id=part_id,
+                            area_id=area_id, instrument_id=instrument_id, dimension_id=dimension_id, patient_id=patient_id)
+
 
 
     return render(request, 'protocolo/question.html', context)
