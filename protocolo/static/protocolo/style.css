@@ -145,3 +145,35 @@
     color: #757a9c;
     text-decoration: none;
 }
+
+/*** <--- CIRCLE STYLES ---> ***/
+.circle {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  margin: .5rem;
+  border-radius: 75%;
+  background: rgb(255, 255, 255);
+  overflow: hidden;
+}
+
+.circle .inner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 25px;
+  height: 25px;
+  background: rgb(255, 255, 255);
+  border-radius: 75%;
+  font-size: .7em;
+  font-weight: 300;
+  color: rgb(0, 0, 0);
+}
+
+.modebar{
+      display: none !important;
+}
